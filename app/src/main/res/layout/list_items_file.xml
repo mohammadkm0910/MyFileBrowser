@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_items_file"
+    android:orientation="vertical"
+    android:padding="8dp"
+    tools:viewBindingIgnore="true">
+    <ImageView
+        android:id="@+id/imgFileType"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:scaleType="fitCenter"
+        android:contentDescription="@null"/>
+    <com.mohammadkk.myfilebrowser.ui.LabelView
+        android:id="@+id/tvFileName"
+        style="@style/Text.Subhead"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_toEndOf="@+id/imgFileType"
+        android:ellipsize="end" />
+    <com.mohammadkk.myfilebrowser.ui.LabelView
+        android:id="@+id/tvFileSize"
+        style="@style/Text.Body1"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/tvFileName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/imgFileType"
+        android:ellipsize="end"
+        app:autoSizeTextType="uniform" />
+</RelativeLayout>

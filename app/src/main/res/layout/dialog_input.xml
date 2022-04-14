@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/editName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="8dp"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLines="1" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOkDialog"
+        style="@style/ThemeButtonPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editName"
+        android:layout_alignParentEnd="true"
+        app:backgroundTint="@color/white"
+        app:rippleColor="@color/grey_300"
+        android:layout_marginHorizontal="12dp"
+        android:text="@android:string/ok"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelDialog"
+        style="@style/ThemeButtonPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editName"
+        android:layout_marginStart="8dp"
+        android:layout_toStartOf="@+id/btnOkDialog"
+        app:backgroundTint="@color/white"
+        app:rippleColor="@color/grey_300"
+        android:text="@string/cancel"/>
+</RelativeLayout>

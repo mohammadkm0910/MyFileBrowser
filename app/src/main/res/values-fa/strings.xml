@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My File Browser</string>
+    <!--subtitle drawer header-->
+    <string name="sub_header_navigation">by Coding with Mohammad kk</string>
+    <!--items drawer-->
+    <string name="home_nav">خانه</string>
+    <string name="internal_nav">حافظه داخلی</string>
+    <string name="card_nav">کارت SD</string>
+    <string name="download_nav">دانلود ها</string>
+    <string name="about_us_nav">درباره ما</string>
+    <!--internal storage on options item selected-->
+    <string name="empty_name">لطفا یک نام وارد کنید</string>
+    <string name="invalid_name">نام شامل کاراکترهای نامعتبر است</string>
+    <string name="empty_folder">پوشه خالی</string>
+    <!--items options menu-->
+    <string name="details">جزئیات</string>
+    <string name="rename">تغییر نام</string>
+    <string name="delete">حذف</string>
+    <string name="share">اشتراک گذاری</string>
+    <!--dialog creator rename dialog-->
+    <string name="rename_file">Rename File</string>
+    <string name="rename_folder">Rename Folder</string>
+    <!--home fragment-->
+    <string name="images">تصاویر</string>
+    <string name="videos">فیلم ها</string>
+    <string name="audios">صوت ها</string>
+    <string name="documents">اسناد</string>
+    <string name="archives">بایگانی ها</string>
+    <string name="others">دیگر</string>
+    <string name="recent_files">فایل اخیر:</string>
+    <!--dialog permission-->
+    <string name="message_permission">Allow <b>MyFile Browser</b> to access photos, media, and files on your device?</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+    <!--action menu-->
+    <string name="create">ایجاد کردن</string>
+    <string name="create_file">ایجاد فایل</string>
+    <string name="create_folder">ایجاد پوشه</string>
+    <string name="exit">خروج</string>
+    <string name="cancel"> لغو کردن</string>
+    <string name="enter_name">Enter name</string>
+    <string name="create_new_folder">Create new folder</string>
+    <string name="create_new_file">Create new file</string>
+    <string name="name_hint">Name</string>
+    <string name="parent_folder_hint">Parent Folder</string>
+    <string name="path_file_hint">Path File</string>
+    <string name="file_size_hint">File Size</string>
+    <string name="last_modified_hint">Last Modified</string>
+    <string name="content_about_page">
+        سلام به استفاده کنندگان از این نرم افزار من محمد کریمی کلات هستم، توسعه دهنده این نرم افزار من در این نرم افزار می خواستم یک مدیریت فایل ساده برای سیستم عامل اندروید طراحی کنم که حاصل این کار همین
+        نرم افزار که مشاهده می شود شده است در این نرم افزار من از فرگمنت های گونان استفاده کرده ام. شامل امکانات حذف فایل، پوشه، اشتراک گذاری فایل، تغییر اسم فایل و پوشه می باشد و امکاناتی نظیر دسترسی به
+        حافظه داخلی دستگاه، کارت SD و همچنین اسکن کردن فایل های آرشیو، تصاویر، فیلم ها، صوت ها و فایل دیگر را دارا می باشد در این پروژه تلاش کرده ام از thread های گوناگون استفاده کنم تا کاربران شاهد تاخیر در
+        رابط کاربری دسنگاه نباشند و این نرم افزار می تواند فایل و پوشه ایجاد کند و همچنین فایل های اخیر کاربر را به نمایش در بیاورد.
+    </string>
+</resources>

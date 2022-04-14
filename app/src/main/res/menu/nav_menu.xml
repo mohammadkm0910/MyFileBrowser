@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/homeNavigation"
+            android:title="@string/home_nav"
+            android:icon="@drawable/ic_home"/>
+        <item
+            android:id="@+id/internalNavigation"
+            android:title="@string/internal_nav"
+            android:icon="@drawable/ic_phone"/>
+        <item
+            android:id="@+id/cardNavigation"
+            android:title="@string/card_nav"
+            android:icon="@drawable/card"/>
+        <item
+            android:id="@+id/downloadNavigation"
+            android:title="@string/download_nav"
+            android:icon="@drawable/ic_downloads"/>
+    </group>
+    <group android:id="@+id/moreGroupNav">
+        <item
+            android:id="@+id/aboutNavigation"
+            android:title="@string/about_us_nav"
+            android:icon="@drawable/ic_about"/>
+    </group>
+</menu>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/mimetypeRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:fastScrollPopupBgColor="@color/pink_400"
+        app:fastScrollTrackColor="@color/grey_300"
+        app:fastScrollThumbInactiveColor="@color/light_blue_500"
+        app:fastScrollThumbColor="@color/blue_A400"/>
+</FrameLayout>

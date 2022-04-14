@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/create">
+        <menu>
+            <item
+                android:id="@+id/createFileOption"
+                android:title="@string/create_file"/>
+            <item
+                android:id="@+id/createFolderOption"
+                android:title="@string/create_folder"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/exitOption"
+        android:title="@string/exit"/>
+</menu>

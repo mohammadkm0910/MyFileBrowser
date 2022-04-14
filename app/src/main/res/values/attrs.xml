@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LabelView">
+        <attr name="fontAsset" format="string"/>
+        <attr name="boldStyle" format="boolean"/>
+    </declare-styleable>
+</resources>

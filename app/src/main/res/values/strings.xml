@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">My File Browser</string>
+    <!--subtitle drawer header-->
+    <string name="sub_header_navigation">by Coding with Mohammad kk</string>
+    <!--items drawer-->
+    <string name="home_nav">Home</string>
+    <string name="internal_nav">Internal Storage</string>
+    <string name="card_nav">SD Card</string>
+    <string name="download_nav">Downloads</string>
+    <string name="about_us_nav">About US</string>
+    <!--internal storage on options item selected-->
+    <string name="empty_name">Please enter a name</string>
+    <string name="invalid_name">The name contains invalid characters</string>
+    <string name="empty_folder">Empty Folder</string>
+    <!--items options menu-->
+    <string name="details">Details</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <!--dialog creator rename dialog-->
+    <string name="rename_file">Rename File</string>
+    <string name="rename_folder">Rename Folder</string>
+    <!--home fragment-->
+    <string name="images">Images</string>
+    <string name="videos">Videos</string>
+    <string name="audios">Audios</string>
+    <string name="documents">Documents</string>
+    <string name="archives">Archives</string>
+    <string name="others">Others</string>
+    <string name="recent_files">Recent File:</string>
+    <!--dialog permission-->
+    <string name="message_permission">Allow <b>MyFile Browser</b> to access photos, media, and files on your device?</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+    <!--action menu-->
+    <string name="create">Create</string>
+    <string name="create_file">Create file</string>
+    <string name="create_folder">Create Folder</string>
+    <string name="exit">Exit</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_name">Enter name</string>
+    <string name="create_new_folder">Create new folder</string>
+    <string name="create_new_file">Create new file</string>
+    <string name="name_hint">Name</string>
+    <string name="parent_folder_hint">Parent Folder</string>
+    <string name="path_file_hint">Path File</string>
+    <string name="file_size_hint">File Size</string>
+    <string name="last_modified_hint">Last Modified</string>
+    <string name="content_about_page">
+        Hello to the users of this software, I am Mohammad Karimi Kalat, the developer of this software. In this software, I wanted to design a simple file management
+        for the Android operating system, which resulted in the same software that can be seen in This software I have used Gunan fragments. It includes the ability to delete files,
+        folders, file sharing, rename files and folders, and features such as access to the device internal memory, SD card, as well as scanning archive files, images, videos,
+        audio and other files. In this project, I have tried to use various threads so that users do not see delays in the user interface of the device, and this software can create
+        files and folders, as well as display the user recent files.
+    </string>
+</resources>

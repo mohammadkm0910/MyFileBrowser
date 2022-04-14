@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/detailOption"
+        android:title="@string/details"
+        android:icon="@drawable/ic_details"/>
+    <item
+        android:id="@+id/renameOption"
+        android:title="@string/rename"
+        android:icon="@drawable/ic_rename"/>
+    <item
+        android:id="@+id/deleteOption"
+        android:title="@string/delete"
+        android:icon="@drawable/ic_delete"/>
+    <item
+        android:id="@+id/shareOption"
+        android:title="@string/share"
+        android:icon="@drawable/ic_share"/>
+</menu>

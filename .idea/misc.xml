@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_ppt.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_about.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_main.xml" value="0.24048913043478262" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_details.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_input.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_permission.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/fragment_home.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/fragment_internal.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/fragment_mim_type.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/list_items_file.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/list_items_file_grid.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/list_items_home.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/list_items_split.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/nav_header.xml" value="0.31521739130434784" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/action_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/menu_main.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/nav_menu.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/options_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

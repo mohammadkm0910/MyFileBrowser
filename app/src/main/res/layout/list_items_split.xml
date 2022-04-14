@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="?actionBarSize"
+    android:paddingHorizontal="4dp">
+    <TextView
+        android:id="@+id/tvSplit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="6dp"
+        android:background="@drawable/bg_items_split"
+        android:textColor="@color/grey_900"
+        app:drawableLeftCompat="@drawable/ic_next"
+        android:drawablePadding="8dp"/>
+</FrameLayout>
