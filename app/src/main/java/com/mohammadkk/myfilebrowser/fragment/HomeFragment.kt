@@ -66,7 +66,7 @@ class HomeFragment : BaseFragment(), FileListener {
             MediaStore.Files.FileColumns.SIZE
         )
         try {
-            if (isOreoPlus()) {
+            if (isQPlus()) {
                 val queryArgs = bundleOf(
                     ContentResolver.QUERY_ARG_LIMIT to RECENT_LIMIT,
                     ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),

@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Parcelable
 import android.view.*
 import androidx.activity.result.ActivityResultLauncher
@@ -126,7 +128,7 @@ class InternalFragment : BaseFragment(), FileListener {
                         } else {
                             if (createFile(newFile)) {
                                 requireActivity().toast("New file created")
-                                fileAdapter.add(newFile)
+                                fileAdapter.add(newFile.toFileItem())
                                 fileAdapter.refresh()
                             } else {
                                 requireActivity().toast("It is not possible to create a file")
@@ -148,7 +150,7 @@ class InternalFragment : BaseFragment(), FileListener {
                         } else {
                             if (createDir(newFolder)) {
                                 requireActivity().toast("New folder created")
-                                fileAdapter.add(newFolder)
+                                fileAdapter.add(newFolder.toFileItem())
                                 fileAdapter.refresh()
                             } else {
                                 requireActivity().toast("It is not possible to create a folder")
@@ -172,19 +174,17 @@ class InternalFragment : BaseFragment(), FileListener {
         files?.forEach { list.add(it.toFileItem()) }
         return list
     }
-    private fun findFiles(documentFile: DocumentFile?): ArrayList<FileItem> {
-        val list = arrayListOf<FileItem>()
+    private fun findFiles(documentFile: DocumentFile?): List<FileItem> {
+        val list = ArrayList<FileItem>()
         documentFile?.listFiles()?.forEach { file ->
-            file?.name?.run {
-                val fullPath = "${storage.absolutePath}/$this"
-                val item = FileItem(
-                    this,
-                    fullPath,
-                    file.isDirectory,
-                    file.length()
-                )
-                list.add(item)
-            }
+            val name = file?.name ?: return@forEach
+            val item = FileItem(
+                name,
+                "${storage.absolutePath}/$name",
+                file.isDirectory,
+                file.length()
+            )
+            list.add(item)
         }
         return list
     }
@@ -193,7 +193,7 @@ class InternalFragment : BaseFragment(), FileListener {
         ensureBackgroundThread {
             runCatching {
                 val items = findFiles(documentFile)
-                requireActivity().runOnUiThread {
+                Handler(Looper.getMainLooper()).post {
                     fileAdapter.addAll(items)
                     fileAdapter.refresh()
                 }
@@ -212,7 +212,7 @@ class InternalFragment : BaseFragment(), FileListener {
             val intent = requireContext().askPermission(current.systemDir(), current.path)
             if (root == "0") {
                 if (current.isAndroidDataEnded()) {
-                    if (baseConfig.androidData != "") {
+                    if (requireContext().isCheckUriPermission(current)) {
                         val uri = Uri.parse(baseConfig.androidData)
                         val doc = DocumentFile.fromTreeUri(requireContext(), uri)
                         displayDocumentFiles(doc)
@@ -221,7 +221,7 @@ class InternalFragment : BaseFragment(), FileListener {
                         launcherIntent.launch(intent)
                     }
                 } else if (current.isAndroidObbEnded()) {
-                    if (baseConfig.androidObb != "") {
+                    if (requireContext().isCheckUriPermission(current)) {
                         val uri = Uri.parse(baseConfig.androidObb)
                         val doc = DocumentFile.fromTreeUri(requireContext(), uri)
                         displayDocumentFiles(doc)
@@ -232,7 +232,7 @@ class InternalFragment : BaseFragment(), FileListener {
                 }
             } else if (root == "1") {
                 if (current.isAndroidDataEnded()) {
-                    if (baseConfig.androidDataSd != "") {
+                    if (requireContext().isCheckUriPermission(current)) {
                         val uri = Uri.parse(baseConfig.androidDataSd)
                         val doc = DocumentFile.fromTreeUri(requireContext(), uri)
                         displayDocumentFiles(doc)
@@ -241,7 +241,7 @@ class InternalFragment : BaseFragment(), FileListener {
                         launcherIntent.launch(intent)
                     }
                 } else if (current.isAndroidObbEnded()) {
-                    if (baseConfig.androidObbSd != "") {
+                    if (requireContext().isCheckUriPermission(current)) {
                         val uri = Uri.parse(baseConfig.androidObbSd)
                         val doc = DocumentFile.fromTreeUri(requireContext(), uri)
                         displayDocumentFiles(doc)

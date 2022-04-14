@@ -34,6 +34,7 @@ import com.mohammadkk.myfilebrowser.helper.INTENT_EXTRA_URI_NEW_API
 import com.mohammadkk.myfilebrowser.helper.ensureBackgroundThread
 import com.mohammadkk.myfilebrowser.helper.isMarshmallowPlus
 import com.mohammadkk.myfilebrowser.helper.isOnMainThread
+import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -69,6 +70,11 @@ fun Context.setPermissionTreeUri(treeUri: Uri) {
         Intent.FLAG_GRANT_READ_URI_PERMISSION or
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     )
+}
+fun Context.isCheckUriPermission(item: FileItem): Boolean {
+    val storageId = DocumentFileCompat.getStorageId(this, item.path)
+    val basePath = DocumentFileCompat.getBasePath(this, item.path)
+    return DocumentFileCompat.isStorageUriPermissionGranted(this, storageId, basePath)
 }
 @RequiresApi(Build.VERSION_CODES.Q)
 fun Context.askPermission(target: String, fullPath: String): Intent {

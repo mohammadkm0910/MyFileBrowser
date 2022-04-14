@@ -36,9 +36,9 @@ data class FileItem(
         val file = File(path)
         return if (isSystem) {
             val documentFile = DocumentFileCompat.fromFile(context, file)
-            if (documentFile?.isDirectory == true) {
-                String.format("%d items", documentFile.listFiles().size)
-            } else (documentFile?.length() ?: 0L).formatSize()
+            if (isDirectory) {
+                String.format("%d items", documentFile?.listFiles()?.size ?: 0)
+            } else size.formatSize()
         } else {
             if (isDirectory) {
                 String.format("%d items", file.getCountChild())

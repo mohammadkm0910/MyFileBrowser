@@ -208,12 +208,8 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         val toItem = item.toFileItem()
         mItems.updateItemAt(index, toItem)
     }
-    fun add(item: File) {
-        val toItem = item.toFileItem()
-        mItems.add(toItem)
-    }
-    fun add(item: FileItem) {
-        mItems.add(item)
+    fun add(item: FileItem): Int {
+        return mItems.add(item)
     }
     fun addAll(items: List<FileItem>) {
         mItems.beginBatchedUpdates()
