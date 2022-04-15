@@ -53,5 +53,13 @@ const val ARCHIVES = "archives"
 const val OTHERS = "others"
 
 enum class SystemNewApi {
-    DATA, OBB, DATA_SD, OBB_SD
+    DATA, OBB, DATA_SD, OBB_SD;
+    companion object {
+        fun getKey(enum: SystemNewApi) = when (enum) {
+            DATA -> "android_data_key"
+            OBB -> "android_obb_key"
+            DATA_SD -> "android_data_sd_key"
+            OBB_SD -> "android_obb_sd_key"
+        }
+    }
 }

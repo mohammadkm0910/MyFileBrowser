@@ -30,10 +30,7 @@ import com.anggrayudi.storage.file.DocumentFileCompat
 import com.anggrayudi.storage.file.deleteRecursively
 import com.mohammadkk.myfilebrowser.BaseConfig
 import com.mohammadkk.myfilebrowser.R
-import com.mohammadkk.myfilebrowser.helper.INTENT_EXTRA_URI_NEW_API
-import com.mohammadkk.myfilebrowser.helper.ensureBackgroundThread
-import com.mohammadkk.myfilebrowser.helper.isMarshmallowPlus
-import com.mohammadkk.myfilebrowser.helper.isOnMainThread
+import com.mohammadkk.myfilebrowser.helper.*
 import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
 import kotlin.math.roundToInt
@@ -64,17 +61,33 @@ fun Context.getExternalStorage(): File? {
     return if (path != null) File(path) else null
 }
 val Context.baseConfig: BaseConfig get() = BaseConfig.newInstance(this)
-fun Context.setPermissionTreeUri(treeUri: Uri) {
-    contentResolver.takePersistableUriPermission(
-        treeUri,
-        Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-    )
+fun Context.isPathPermission(uri: Uri?): Boolean {
+    val listUri = arrayListOf<Uri>()
+    contentResolver.persistedUriPermissions.forEach {
+        if (it.isWritePermission && it.isReadPermission) {
+            listUri.add(it.uri)
+        }
+    }
+    if (listUri.isNullOrEmpty()) return false
+    return listUri.contains(uri ?: return false)
 }
-fun Context.isCheckUriPermission(item: FileItem): Boolean {
-    val storageId = DocumentFileCompat.getStorageId(this, item.path)
-    val basePath = DocumentFileCompat.getBasePath(this, item.path)
-    return DocumentFileCompat.isStorageUriPermissionGranted(this, storageId, basePath)
+fun Context.getEnumSystemNewApi(item: FileItem): SystemNewApi? {
+    var enum: SystemNewApi? = null
+    val root = compareStorage(item.path)[1]
+    if (item.isAndroidDataEnded()) {
+        if (root == "0") {
+            enum = SystemNewApi.DATA
+        } else if (root == "1") {
+            enum = SystemNewApi.DATA_SD
+        }
+    } else if (item.isAndroidObbEnded()) {
+        if (root == "0") {
+            enum = SystemNewApi.OBB
+        } else if (root == "1") {
+            enum = SystemNewApi.OBB_SD
+        }
+    }
+    return enum
 }
 @RequiresApi(Build.VERSION_CODES.Q)
 fun Context.askPermission(target: String, fullPath: String): Intent {
@@ -225,7 +238,6 @@ fun Context.rescanPaths(paths: List<String>, callback: (() -> Unit)? = null) {
         }
     }
 }
-@Suppress("HasPlatformType")
 private fun getFileUri(path: String) = when {
     path.isImageSlow() -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     path.isVideoSlow() -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI

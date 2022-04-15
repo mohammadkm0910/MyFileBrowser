@@ -3,6 +3,8 @@ package com.mohammadkk.myfilebrowser.fragment
 import android.content.ContentResolver
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +21,6 @@ import com.mohammadkk.myfilebrowser.extension.*
 import com.mohammadkk.myfilebrowser.helper.*
 import com.mohammadkk.myfilebrowser.model.FileItem
 import com.mohammadkk.myfilebrowser.model.HomeItems
-import kotlinx.coroutines.*
 import java.io.File
 
 class HomeFragment : BaseFragment(), FileListener {
@@ -98,20 +99,11 @@ class HomeFragment : BaseFragment(), FileListener {
         binding.recentRV.layoutManager = GridLayoutManager(requireContext(), 3)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
         binding.recentRV.adapter = fileAdapter
-        val executorJOB = SupervisorJob()
-        val handlerExc = CoroutineExceptionHandler { _, throwable ->
-            throwable.printStackTrace()
-        }
-        val uiDispatcher = Dispatchers.Main
-        val ioDispatcher = Dispatchers.IO + executorJOB + handlerExc
-        val uiScope = CoroutineScope(uiDispatcher)
-        uiScope.launch {
-            withContext(ioDispatcher) {
-                val fileList = findRecentFiles()
-                withContext(uiDispatcher) {
-                    fileAdapter.addAll(fileList)
-                    fileAdapter.refresh()
-                    executorJOB.cancel()
+        ensureBackgroundThread {
+            runCatching {
+                val items = findRecentFiles()
+                Handler(Looper.getMainLooper()).post {
+                    fileAdapter.addAll(items)
                 }
             }
         }

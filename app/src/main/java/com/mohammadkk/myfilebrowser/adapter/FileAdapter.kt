@@ -1,5 +1,6 @@
 package com.mohammadkk.myfilebrowser.adapter
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.MediaMetadataRetriever
@@ -25,7 +26,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import kotlinx.coroutines.*
 import java.io.File
 import java.lang.reflect.Method
-import java.util.*
 
 
 class FileAdapter(private val activity: Activity, private val isGrid: Boolean = false, private val listener: FileListener) :
@@ -99,12 +99,13 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         }
         uiScope.launch {
             withContext(ioDispatcher) {
-                val imageOf = getImage(position)
+                val placeholder = getPlaceholder(file.path)
+                val imageOf = getImage(position, placeholder)
                 withContext(uiDispatcher) {
                     Glide.with(activity)
                         .asDrawable()
                         .load(imageOf)
-                        .placeholder(getImageRequire(file.path))
+                        .placeholder(placeholder)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .format(DecodeFormat.PREFER_ARGB_8888)
                         .centerCrop()
@@ -148,8 +149,8 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     fun setOnItemClick(listener: (item: FileItem) -> Unit) {
         itemClick = listener
     }
-    private fun getImage(position: Int): Any {
-        val item = mItems.get(position)
+    private fun getImage(position: Int, placeholder: Int): Any {
+        val item = get(position)
         if (item.isDirectory) return R.drawable.ic_folder
         if (item.path.endsWith(".apk", true)) {
             val pi = activity.packageManager.getPackageArchiveInfo(
@@ -176,15 +177,15 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
             }
             return art ?: FileResource(item.path).getMusicIcon()
         }
-        return getImageRequire(item.path)
+        return placeholder
     }
-    private fun getImageRequire(path: String): Int {
+    private fun getPlaceholder(path: String): Int {
         val fileResource = FileResource(path)
-        val isValid = fileResource.invalidExtension()
-        return if (isValid) {
-            fileResource.getImages()!!
+        val images = fileResource.getImages()
+        return if (images != null) {
+            return images
         } else {
-            val mime = path.mimetype.lowercase(Locale.getDefault())
+            val mime = path.mimetype.lowercase()
             when {
                 path.isImageSlow() -> R.drawable.ic_image
                 path.isAudioSlow() -> R.drawable.ic_music
@@ -195,6 +196,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
             }
         }
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun refresh() {
         for (i in 0 until mItems.size())
             notifyItemChanged(i)
@@ -213,7 +215,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     }
     fun addAll(items: List<FileItem>) {
         mItems.beginBatchedUpdates()
-        mItems.addAll(items)
+        items.map { add(it) }
         mItems.endBatchedUpdates()
     }
     fun removeItemAt(index: Int): FileItem {

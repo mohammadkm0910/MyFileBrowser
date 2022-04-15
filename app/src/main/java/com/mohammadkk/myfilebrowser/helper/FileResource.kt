@@ -44,11 +44,6 @@ class FileResource(private val path: String) {
     fun getMusicIcon(): Int {
         return if (path.extension == "mp3") R.drawable.ic_mp3 else R.drawable.ic_music
     }
-    fun invalidExtension(): Boolean {
-        val map = imageResource()
-        val key = map.keys
-        return key.any { it ==  path.substringAfterLast('.') }
-    }
     fun getImages(): Int? {
         val map = imageResource()
         return map[path.substringAfterLast('.')]

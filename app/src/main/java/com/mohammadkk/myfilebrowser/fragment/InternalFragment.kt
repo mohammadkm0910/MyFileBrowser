@@ -2,7 +2,6 @@ package com.mohammadkk.myfilebrowser.fragment
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -49,15 +48,16 @@ class InternalFragment : BaseFragment(), FileListener {
                     val pathUri = treeUri.path ?: ""
                     val baseConfig = requireContext().baseConfig
                     if (pathUri.endsWith("Android/data") || pathUri.endsWith("Android/obb")) {
-                        when (systemNewApi ?: return@let) {
-                            SystemNewApi.DATA -> baseConfig.androidData = treeUri.toString()
-                            SystemNewApi.OBB -> baseConfig.androidObb = treeUri.toString()
-                            SystemNewApi.DATA_SD -> baseConfig.androidDataSd = treeUri.toString()
-                            SystemNewApi.OBB_SD -> baseConfig.androidObbSd = treeUri.toString()
+                        if (systemNewApi != null) {
+                            baseConfig.setUriPath(systemNewApi!!, treeUri)
+                            requireContext().contentResolver.takePersistableUriPermission(
+                                treeUri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            )
+                            val documentFile = DocumentFile.fromTreeUri(requireContext(), treeUri)
+                            displayDocumentFiles(documentFile)
                         }
-                        requireContext().setPermissionTreeUri(treeUri)
-                        val documentFile = DocumentFile.fromTreeUri(requireContext(), treeUri)
-                        displayDocumentFiles(documentFile)
                     }
                 }
             }
@@ -195,7 +195,6 @@ class InternalFragment : BaseFragment(), FileListener {
                 val items = findFiles(documentFile)
                 Handler(Looper.getMainLooper()).post {
                     fileAdapter.addAll(items)
-                    fileAdapter.refresh()
                 }
             }
         }
@@ -203,53 +202,20 @@ class InternalFragment : BaseFragment(), FileListener {
     override fun displayFiles() {
         val current = storage.toFileItem()
         val baseConfig = requireContext().baseConfig
-        val root = requireContext().compareStorage(storage.absolutePath)[1]
+        val currentEnum = requireContext().getEnumSystemNewApi(current)
         binding.storageRecycler.setHasFixedSize(true)
         binding.storageRecycler.layoutManager = GridLayoutManager(requireContext(), 1)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
         binding.storageRecycler.adapter = fileAdapter
         if (isQPlus() && current.systemDir().isNotEmpty()) {
             val intent = requireContext().askPermission(current.systemDir(), current.path)
-            if (root == "0") {
-                if (current.isAndroidDataEnded()) {
-                    if (requireContext().isCheckUriPermission(current)) {
-                        val uri = Uri.parse(baseConfig.androidData)
-                        val doc = DocumentFile.fromTreeUri(requireContext(), uri)
-                        displayDocumentFiles(doc)
-                    } else {
-                        systemNewApi = SystemNewApi.DATA
-                        launcherIntent.launch(intent)
-                    }
-                } else if (current.isAndroidObbEnded()) {
-                    if (requireContext().isCheckUriPermission(current)) {
-                        val uri = Uri.parse(baseConfig.androidObb)
-                        val doc = DocumentFile.fromTreeUri(requireContext(), uri)
-                        displayDocumentFiles(doc)
-                    } else {
-                        systemNewApi = SystemNewApi.OBB
-                        launcherIntent.launch(intent)
-                    }
-                }
-            } else if (root == "1") {
-                if (current.isAndroidDataEnded()) {
-                    if (requireContext().isCheckUriPermission(current)) {
-                        val uri = Uri.parse(baseConfig.androidDataSd)
-                        val doc = DocumentFile.fromTreeUri(requireContext(), uri)
-                        displayDocumentFiles(doc)
-                    } else {
-                        systemNewApi = SystemNewApi.DATA_SD
-                        launcherIntent.launch(intent)
-                    }
-                } else if (current.isAndroidObbEnded()) {
-                    if (requireContext().isCheckUriPermission(current)) {
-                        val uri = Uri.parse(baseConfig.androidObbSd)
-                        val doc = DocumentFile.fromTreeUri(requireContext(), uri)
-                        displayDocumentFiles(doc)
-                    } else {
-                        systemNewApi = SystemNewApi.OBB_SD
-                        launcherIntent.launch(intent)
-                    }
-                }
+            val uri = baseConfig.getUriPath(currentEnum)
+            if (uri != null && requireContext().isPathPermission(uri)) {
+                val doc = DocumentFile.fromTreeUri(requireContext(), uri)
+                displayDocumentFiles(doc)
+            } else {
+                systemNewApi = currentEnum
+                launcherIntent.launch(intent)
             }
             return
         }
@@ -264,7 +230,6 @@ class InternalFragment : BaseFragment(), FileListener {
                 val items = findFiles(storage)
                 requireActivity().runOnUiThread {
                     fileAdapter.addAll(items)
-                    fileAdapter.refresh()
                 }
             }
         }
