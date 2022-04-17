@@ -49,16 +49,14 @@ fun Context.getInternalStorage(): File {
     return File(path)
 }
 fun Context.getExternalStorage(): File? {
-    val selected = arrayListOf<String?>()
-    selected.add(0, null)
+    var base: String? = null
     for (file in externalCacheDirs) {
         if (Environment.isExternalStorageRemovable(file)) {
-            selected[0] = file.path.split("/Android")[0]
+            base = file.path.split("/Android")[0]
             break
         }
     }
-    val path = selected[0]
-    return if (path != null) File(path) else null
+    return if (base != null) File(base) else null
 }
 val Context.baseConfig: BaseConfig get() = BaseConfig.newInstance(this)
 fun Context.isPathPermission(uri: Uri?): Boolean {
@@ -226,16 +224,14 @@ fun Context.updateFileMediaStore(oldPath: String, newPath: String) {
         }
     }
 }
-fun Context.rescanPaths(paths: List<String>, callback: (() -> Unit)? = null) {
+fun Context.rescanPaths(paths: Array<String>, callback: (() -> Unit)? = null) {
     if (paths.isEmpty()) {
         callback?.invoke()
         return
     }
     var cnt = paths.size
-    MediaScannerConnection.scanFile(applicationContext, paths.toTypedArray(), null) { _, _ ->
-        if (--cnt == 0) {
-            callback?.invoke()
-        }
+    MediaScannerConnection.scanFile(applicationContext, paths, null) { _, _ ->
+        if (--cnt == 0) callback?.invoke()
     }
 }
 private fun getFileUri(path: String) = when {

@@ -40,22 +40,22 @@ class InternalFragment : BaseFragment(), FileListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        fileAdapter = FileAdapter(requireActivity(), listener = this)
+        fileAdapter = FileAdapter(mActivity, listener = this)
         dialogCreator = DialogCreator(requireActivity())
         launcherIntent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { treeUri ->
                     val pathUri = treeUri.path ?: ""
-                    val baseConfig = requireContext().baseConfig
+                    val baseConfig = mContext.baseConfig
                     if (pathUri.endsWith("Android/data") || pathUri.endsWith("Android/obb")) {
                         if (systemNewApi != null) {
                             baseConfig.setUriPath(systemNewApi!!, treeUri)
-                            requireContext().contentResolver.takePersistableUriPermission(
+                            mContext.contentResolver.takePersistableUriPermission(
                                 treeUri,
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                             )
-                            val documentFile = DocumentFile.fromTreeUri(requireContext(), treeUri)
+                            val documentFile = DocumentFile.fromTreeUri(mContext, treeUri)
                             displayDocumentFiles(documentFile)
                         }
                     }
@@ -80,15 +80,15 @@ class InternalFragment : BaseFragment(), FileListener {
     private fun initSplitStorage() {
         val currentPath = storage.absolutePath.trim('/')
         val items = currentPath.split('/')
-        val storageAdapter = StorageAdapter(requireContext(), items)
+        val storageAdapter = StorageAdapter(mContext, items)
         storageAdapter.setOnItemClickListener { position ->
             val storageBuilder = StringBuilder()
             for (index in 0..position) {
                 storageBuilder.append("/${items[index]}")
             }
-            requireActivity().navigate(newInstance(storageBuilder.toString()))
+            mActivity.navigate(newInstance(storageBuilder.toString()))
         }
-        val layout = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        val layout = LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false)
         binding.splitRecycler.layoutManager = layout
         binding.splitRecycler.adapter = storageAdapter
     }
@@ -96,7 +96,7 @@ class InternalFragment : BaseFragment(), FileListener {
         ensureBackgroundThread {
             try {
                 val fileList = findFiles(storage)
-                requireActivity().runOnUiThread {
+                mActivity.runOnUiThread {
                     fileAdapter.clear()
                     fileAdapter.addAll(fileList)
                     fileAdapter.refresh()
@@ -119,19 +119,19 @@ class InternalFragment : BaseFragment(), FileListener {
             R.id.createFileOption -> {
                 dc.createNewInStorageDialog(true) { output, dialog ->
                     if (output.isEmpty || !output.isAValidFilename()) {
-                        requireContext().toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
+                        mContext.toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
                     } else {
                         val newPath = "${storage.absolutePath.trimEnd('/')}/$output"
                         val newFile = File(newPath)
                         if (newFile.exists()) {
-                            requireActivity().toast("This file already exists")
+                            mActivity.toast("This file already exists")
                         } else {
                             if (createFile(newFile)) {
-                                requireActivity().toast("New file created")
+                                mActivity.toast("New file created")
                                 fileAdapter.add(newFile.toFileItem())
                                 fileAdapter.refresh()
                             } else {
-                                requireActivity().toast("It is not possible to create a file")
+                                mActivity.toast("It is not possible to create a file")
                             }
                         }
                         dialog.dismiss()
@@ -141,19 +141,19 @@ class InternalFragment : BaseFragment(), FileListener {
             R.id.createFolderOption -> {
                 dc.createNewInStorageDialog(false) { output, dialog ->
                     if (output.isEmpty || !output.isAValidFilename()) {
-                        requireContext().toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
+                        mContext.toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
                     } else {
                         val newPath = "${storage.absolutePath.trimEnd('/')}/$output"
                         val newFolder = File(newPath)
                         if (newFolder.exists()) {
-                            requireActivity().toast("This folder already exists")
+                            mActivity.toast("This folder already exists")
                         } else {
                             if (createDir(newFolder)) {
-                                requireActivity().toast("New folder created")
+                                mActivity.toast("New folder created")
                                 fileAdapter.add(newFolder.toFileItem())
                                 fileAdapter.refresh()
                             } else {
-                                requireActivity().toast("It is not possible to create a folder")
+                                mActivity.toast("It is not possible to create a folder")
                             }
                         }
                         dialog.dismiss()
@@ -161,9 +161,9 @@ class InternalFragment : BaseFragment(), FileListener {
                 }
             }
             R.id.exitOption -> {
-                requireContext().toast("Closing Application...")
-                requireActivity().moveTaskToBack(true)
-                requireActivity().finish()
+                mContext.toast("Closing Application...")
+                mActivity.moveTaskToBack(true)
+                mActivity.finish()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -201,17 +201,17 @@ class InternalFragment : BaseFragment(), FileListener {
     }
     override fun displayFiles() {
         val current = storage.toFileItem()
-        val baseConfig = requireContext().baseConfig
-        val currentEnum = requireContext().getEnumSystemNewApi(current)
+        val baseConfig = mContext.baseConfig
+        val currentEnum = mContext.getEnumSystemNewApi(current)
         binding.storageRecycler.setHasFixedSize(true)
-        binding.storageRecycler.layoutManager = GridLayoutManager(requireContext(), 1)
+        binding.storageRecycler.layoutManager = GridLayoutManager(mContext, 1)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
         binding.storageRecycler.adapter = fileAdapter
         if (isQPlus() && current.systemDir().isNotEmpty()) {
-            val intent = requireContext().askPermission(current.systemDir(), current.path)
+            val intent = mContext.askPermission(current.systemDir(), current.path)
             val uri = baseConfig.getUriPath(currentEnum)
-            if (uri != null && requireContext().isPathPermission(uri)) {
-                val doc = DocumentFile.fromTreeUri(requireContext(), uri)
+            if (uri != null && mContext.isPathPermission(uri)) {
+                val doc = DocumentFile.fromTreeUri(mContext, uri)
                 displayDocumentFiles(doc)
             } else {
                 systemNewApi = currentEnum
@@ -220,7 +220,7 @@ class InternalFragment : BaseFragment(), FileListener {
             return
         }
         if (current.isAndroidData() || current.isAndroidObb()) {
-            val documentFile = DocumentFileCompat.fromFile(requireContext(), storage)
+            val documentFile = DocumentFileCompat.fromFile(mContext, storage)
             displayDocumentFiles(documentFile)
             return
         }
@@ -228,8 +228,9 @@ class InternalFragment : BaseFragment(), FileListener {
         ensureBackgroundThread {
             runCatching {
                 val items = findFiles(storage)
-                requireActivity().runOnUiThread {
+                mActivity.runOnUiThread {
                     fileAdapter.addAll(items)
+                    mActivity.snackBar(mContext.getInternalStorage().listFiles()?.size.toString())
                 }
             }
         }
@@ -248,14 +249,14 @@ class InternalFragment : BaseFragment(), FileListener {
     private fun onFileClicked(item: FileItem) {
         if (item.isDirectory) {
             val internalFragment = newInstance(item.path)
-            requireActivity().navigate(internalFragment, true)
+            mActivity.navigate(internalFragment, true)
         } else {
             Intent().apply {
                 action = Intent.ACTION_VIEW
                 setDataAndType(uriByFileItem(item), item.path.mimetype)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                requireContext().launchRequireIntent(this)
+                mContext.launchRequireIntent(this)
             }
         }
     }
@@ -269,15 +270,15 @@ class InternalFragment : BaseFragment(), FileListener {
             val extension = file.extension
             if (edtExtension.isEmpty()) newName += if (extension.isNotEmpty()) ".$extension" else ""
             val newFile = File(file.parent?:return@renameDialog, output)
-            if (file.renameTo(requireContext(), newFile)) {
+            if (file.renameTo(mContext, newFile)) {
                 fileAdapter.updateItemAt(position, newFile)
-                requireContext().rescanPaths(arrayListOf(file.absolutePath, newFile.absolutePath)) {
-                    requireContext().updateFileMediaStore(file.absolutePath, newFile.absolutePath)
+                mContext.rescanPaths(arrayOf(file.absolutePath, newFile.absolutePath)) {
+                    mContext.updateFileMediaStore(file.absolutePath, newFile.absolutePath)
                 }
                 fileAdapter.refresh()
-                requireContext().toast("renamed!!")
+                mContext.toast("renamed!!")
             } else {
-                requireContext().toast("Couldn't Renamed!")
+                mContext.toast("Couldn't Renamed!")
             }
             dialog.dismiss()
         }
@@ -285,11 +286,11 @@ class InternalFragment : BaseFragment(), FileListener {
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
             if (deleteFileItem(item)) {
-                requireContext().deleteFileMediaStore(item.path)
+                mContext.deleteFileMediaStore(item.path)
                 fileAdapter.removeItemAt(position)
                 fileAdapter.refresh()
-                requireContext().toast("Deleted!")
-            } else requireContext().toast("Couldn't Deleted!")
+                mContext.toast("Deleted!")
+            } else mContext.toast("Couldn't Deleted!")
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {
@@ -297,7 +298,7 @@ class InternalFragment : BaseFragment(), FileListener {
             action = Intent.ACTION_SEND
             type = item.path.mimetype
             putExtra(Intent.EXTRA_STREAM, uriByFileItem(item))
-            requireContext().launchRequireIntent(
+            mContext.launchRequireIntent(
                 Intent.createChooser(this,"share ${item.name}")
             )
         }
@@ -306,13 +307,13 @@ class InternalFragment : BaseFragment(), FileListener {
         if (folder.exists())
             return false
         if (folder.mkdir()) {
-            requireActivity().rescanPaths(listOf(folder.absolutePath))
+            mActivity.rescanPaths(arrayOf(folder.absolutePath))
             return true
         } else {
             val parent = folder.parentFile ?: return false
-            val document = DocumentFileCompat.fromFile(requireContext(), parent)
+            val document = DocumentFileCompat.fromFile(mContext, parent)
             if (document?.createDirectory(folder.name) != null) {
-                requireActivity().rescanPaths(listOf(folder.absolutePath))
+                mActivity.rescanPaths(arrayOf(folder.absolutePath))
                 return true
             }
         }
@@ -324,7 +325,7 @@ class InternalFragment : BaseFragment(), FileListener {
         try {
             if (file.createNewFile()) {
                 if (file.exists()) {
-                    requireActivity().rescanPaths(listOf(file.absolutePath))
+                    mActivity.rescanPaths(arrayOf(file.absolutePath))
                     result = true
                 }
             }
@@ -333,10 +334,10 @@ class InternalFragment : BaseFragment(), FileListener {
         }
         if (!result) {
             val parent = file.parentFile ?: return false
-            val document = DocumentFileCompat.fromFile(requireContext(), parent)
+            val document = DocumentFileCompat.fromFile(mContext, parent)
             try {
                 val de = document?.createFile(file.mimetype, file.name)
-                requireActivity().rescanPaths(listOf(file.absolutePath))
+                mActivity.rescanPaths(arrayOf(file.absolutePath))
                 result = de != null
             } catch (e: Exception) {
                 e.printStackTrace()

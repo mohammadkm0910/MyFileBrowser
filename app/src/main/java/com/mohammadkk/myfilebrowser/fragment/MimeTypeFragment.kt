@@ -34,7 +34,7 @@ class MimeTypeFragment: BaseFragment(), FileListener {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fileAdapter = FileAdapter(requireActivity(), true, this)
+        fileAdapter = FileAdapter(mActivity, true, this)
         runTimePermission(binding.root) {
             displayFiles()
         }
@@ -48,7 +48,7 @@ class MimeTypeFragment: BaseFragment(), FileListener {
             Files.FileColumns.DISPLAY_NAME,
             Files.FileColumns.SIZE
         )
-        requireContext().queryCursor(uri, projection) { cursor ->
+        mContext.queryCursor(uri, projection) { cursor ->
             try {
                 val fullMimeType = cursor.getStringValue(Files.FileColumns.MIME_TYPE)?.lowercase(Locale.getDefault()) ?:return@queryCursor
                 val name = cursor.getStringValue(Files.FileColumns.DISPLAY_NAME)
@@ -100,12 +100,12 @@ class MimeTypeFragment: BaseFragment(), FileListener {
     }
     override fun displayFiles() {
         binding.mimetypeRecycler.setHasFixedSize(true)
-        binding.mimetypeRecycler.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.mimetypeRecycler.layoutManager = GridLayoutManager(mContext, 3)
         ensureBackgroundThread {
             try {
                 val fileList = findFiles()
                 fileAdapter.addAll(fileList)
-                requireActivity().runOnUiThread {
+                mActivity.runOnUiThread {
                     fileAdapter.setOnItemClick { item -> onFileClicked(item) }
                     binding.mimetypeRecycler.adapter = fileAdapter
                 }
@@ -118,7 +118,7 @@ class MimeTypeFragment: BaseFragment(), FileListener {
             setDataAndType(uriByFileItem(item), item.path.mimetype)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            requireContext().launchRequireIntent(this)
+            mContext.launchRequireIntent(this)
         }
     }
     override fun onOpenDetailDialog(item: FileItem, position: Int) {
@@ -131,15 +131,15 @@ class MimeTypeFragment: BaseFragment(), FileListener {
             val extension = file.extension
             if (edtExtension.isEmpty()) newName += if (extension.isNotEmpty()) ".$extension" else ""
             val newFile = File(file.parent?:return@renameDialog, output)
-            if (file.renameTo(requireContext(), newFile)) {
+            if (file.renameTo(mContext, newFile)) {
                 fileAdapter.updateItemAt(position, newFile)
-                requireContext().rescanPaths(arrayListOf(file.absolutePath, newFile.absolutePath)) {
-                    requireContext().updateFileMediaStore(file.absolutePath, newFile.absolutePath)
+                mContext.rescanPaths(arrayOf(file.absolutePath, newFile.absolutePath)) {
+                    mContext.updateFileMediaStore(file.absolutePath, newFile.absolutePath)
                 }
                 fileAdapter.refresh()
-                requireContext().toast("renamed!!")
+                mContext.toast("renamed!!")
             } else {
-                requireContext().toast("Couldn't Renamed!")
+                mContext.toast("Couldn't Renamed!")
             }
             dialog.dismiss()
         }
@@ -147,11 +147,11 @@ class MimeTypeFragment: BaseFragment(), FileListener {
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
             if (deleteFileItem(item)) {
-                requireContext().deleteFileMediaStore(item.path)
+                mContext.deleteFileMediaStore(item.path)
                 fileAdapter.removeItemAt(position)
                 fileAdapter.refresh()
-                requireContext().toast("Deleted!")
-            } else requireContext().toast("Couldn't Deleted!")
+                mContext.toast("Deleted!")
+            } else mContext.toast("Couldn't Deleted!")
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {
@@ -159,7 +159,7 @@ class MimeTypeFragment: BaseFragment(), FileListener {
             action = Intent.ACTION_SEND
             type = item.path.mimetype
             putExtra(Intent.EXTRA_STREAM, uriByFileItem(item))
-            requireContext().launchRequireIntent(
+            mContext.launchRequireIntent(
                 Intent.createChooser(this,"share ${item.name}")
             )
         }

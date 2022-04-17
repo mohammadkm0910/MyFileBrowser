@@ -30,7 +30,7 @@ class HomeFragment : BaseFragment(), FileListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fileAdapter = FileAdapter(requireActivity(), true, this)
+        fileAdapter = FileAdapter(mActivity, true, this)
         dialogCreator = DialogCreator(requireActivity())
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -45,7 +45,7 @@ class HomeFragment : BaseFragment(), FileListener {
         }
     }
     private fun displayGridHome() {
-        binding.gridHomeRecycler.layoutManager = GridLayoutManager(requireContext(), resources.getInteger(
+        binding.gridHomeRecycler.layoutManager = GridLayoutManager(mContext, resources.getInteger(
             R.integer.grid_home_span))
         val items = mutableSetOf(
             HomeItems(R.string.images, R.drawable.ic_image, R.color.image_holder, IMAGES),
@@ -55,7 +55,7 @@ class HomeFragment : BaseFragment(), FileListener {
             HomeItems(R.string.archives, R.drawable.ic_archives, R.color.archives_holder, ARCHIVES),
             HomeItems(R.string.others, R.drawable.ic_others, R.color.others_holder, OTHERS)
         )
-        binding.gridHomeRecycler.adapter = HomeAdapter(requireActivity(), items)
+        binding.gridHomeRecycler.adapter = HomeAdapter(mActivity, items)
     }
     private fun findRecentFiles(): List<FileItem> {
         val fileItems = arrayListOf<FileItem>()
@@ -73,10 +73,10 @@ class HomeFragment : BaseFragment(), FileListener {
                     ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),
                     ContentResolver.QUERY_ARG_SORT_DIRECTION to ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
                 )
-                requireContext().contentResolver.query(uri, projection, queryArgs, null)
+                mContext.contentResolver.query(uri, projection, queryArgs, null)
             } else {
                 val sortOrder = "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC LIMIT $RECENT_LIMIT"
-                requireContext().contentResolver.query(uri, projection, null, null, sortOrder)
+                mContext.contentResolver.query(uri, projection, null, null, sortOrder)
             }?.use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
@@ -96,7 +96,7 @@ class HomeFragment : BaseFragment(), FileListener {
         (binding.recentRV.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         binding.recentRV.setHasFixedSize(false)
         binding.recentRV.isNestedScrollingEnabled = false
-        binding.recentRV.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.recentRV.layoutManager = GridLayoutManager(mContext, 3)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
         binding.recentRV.adapter = fileAdapter
         ensureBackgroundThread {
@@ -110,7 +110,7 @@ class HomeFragment : BaseFragment(), FileListener {
     }
     private fun onFileClicked(item: FileItem) {
         if (item.isDirectory) {
-            requireActivity().navigate(InternalFragment.newInstance(item.path), true)
+            mActivity.navigate(InternalFragment.newInstance(item.path), true)
             return
         }
         Intent().apply {
@@ -118,7 +118,7 @@ class HomeFragment : BaseFragment(), FileListener {
             setDataAndType(uriByFileItem(item), item.path.mimetype)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            requireContext().launchRequireIntent(this)
+            mContext.launchRequireIntent(this)
         }
     }
     override fun onOpenDetailDialog(item: FileItem, position: Int) {
@@ -131,15 +131,15 @@ class HomeFragment : BaseFragment(), FileListener {
             val extension = file.extension
             if (edtExtension.isEmpty()) newName += if (extension.isNotEmpty()) ".$extension" else ""
             val newFile = File(file.parent?:return@renameDialog, output)
-            if (file.renameTo(requireContext(), newFile)) {
+            if (file.renameTo(mContext, newFile)) {
                 fileAdapter.updateItemAt(position, newFile)
-                requireContext().rescanPaths(arrayListOf(file.absolutePath, newFile.absolutePath)) {
-                    requireContext().updateFileMediaStore(file.absolutePath, newFile.absolutePath)
+                mContext.rescanPaths(arrayOf(file.absolutePath, newFile.absolutePath)) {
+                    mContext.updateFileMediaStore(file.absolutePath, newFile.absolutePath)
                 }
                 fileAdapter.refresh()
-                requireContext().toast("renamed!!")
+                mContext.toast("renamed!!")
             } else {
-                requireContext().toast("Couldn't Renamed!")
+                mContext.toast("Couldn't Renamed!")
             }
             dialog.dismiss()
         }
@@ -147,11 +147,11 @@ class HomeFragment : BaseFragment(), FileListener {
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
             if (deleteFileItem(item)) {
-                requireContext().deleteFileMediaStore(item.path)
+                mContext.deleteFileMediaStore(item.path)
                 fileAdapter.removeItemAt(position)
                 fileAdapter.refresh()
-                requireContext().toast("Deleted!")
-            } else requireContext().toast("Couldn't Deleted!")
+                mContext.toast("Deleted!")
+            } else mContext.toast("Couldn't Deleted!")
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {
@@ -159,7 +159,7 @@ class HomeFragment : BaseFragment(), FileListener {
             action = Intent.ACTION_SEND
             type = item.path.mimetype
             putExtra(Intent.EXTRA_STREAM, uriByFileItem(item))
-            requireContext().launchRequireIntent(
+            mContext.launchRequireIntent(
                 Intent.createChooser(this,"share ${item.name}")
             )
         }

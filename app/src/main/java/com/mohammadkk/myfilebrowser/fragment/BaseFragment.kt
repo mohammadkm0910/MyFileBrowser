@@ -1,6 +1,7 @@
 package com.mohammadkk.myfilebrowser.fragment
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +31,9 @@ abstract class BaseFragment : Fragment() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     private lateinit var resultActivity : ActivityResultLauncher<Intent>
+
+    protected val mContext: Context get() = requireContext()
+    protected val mActivity: FragmentActivity get() = requireActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
