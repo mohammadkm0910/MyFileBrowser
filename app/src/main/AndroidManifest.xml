@@ -22,7 +22,8 @@
         android:theme="@style/Theme.MyFileBrowser">
         <activity
             android:name=".AboutActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.MyFileBrowser.AboutUs"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

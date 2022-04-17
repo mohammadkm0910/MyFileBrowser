@@ -67,7 +67,7 @@ class HomeFragment : BaseFragment(), FileListener {
             MediaStore.Files.FileColumns.SIZE
         )
         try {
-            if (isQPlus()) {
+            if (isRPlus()) {
                 val queryArgs = bundleOf(
                     ContentResolver.QUERY_ARG_LIMIT to RECENT_LIMIT,
                     ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),
@@ -83,14 +83,16 @@ class HomeFragment : BaseFragment(), FileListener {
                         val path = cursor.getStringValue( MediaStore.Files.FileColumns.DATA)
                         val name = cursor.getStringValue( MediaStore.Files.FileColumns.DISPLAY_NAME) ?: path.substringAfterLast('/')
                         val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
-                        fileItems.add(
-                            FileItem(name, path, File(path).isDirectory, size)
-                        )
+                        if (!name.startsWith('.')) {
+                            fileItems.add(
+                                FileItem(name, path, File(path).isDirectory, size)
+                            )
+                        }
                     } while (cursor.moveToNext())
                 }
             }
         } catch (e: Exception) {}
-        return fileItems.filter { !it.name.startsWith('.') }
+        return fileItems
     }
     override fun displayFiles() {
         (binding.recentRV.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false

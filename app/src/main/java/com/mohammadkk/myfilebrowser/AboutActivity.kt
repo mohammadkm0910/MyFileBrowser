@@ -10,7 +10,6 @@ class AboutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAboutBinding.inflate(layoutInflater)
-        setTheme(R.style.Theme_MyFileBrowser_AboutUs)
         setContentView(binding.root)
         binding.mainToolbar.setNavigationOnClickListener {
             onBackPressed()

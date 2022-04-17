@@ -3,19 +3,24 @@ package com.mohammadkk.myfilebrowser.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.extension.*
 import com.mohammadkk.myfilebrowser.helper.FileResource
@@ -99,17 +104,20 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         }
         uiScope.launch {
             withContext(ioDispatcher) {
-                val placeholder = getPlaceholder(file.path)
+                val placeholder = getPlaceholder(file)
                 val imageOf = getImage(position, placeholder)
                 withContext(uiDispatcher) {
-                    Glide.with(activity)
-                        .asDrawable()
+                    val glide = Glide.with(activity)
                         .load(imageOf)
+                        .apply(RequestOptions())
                         .placeholder(placeholder)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .format(DecodeFormat.PREFER_ARGB_8888)
-                        .centerCrop()
-                        .into(holder.imgFileType)
+                    if (imageOf is String || imageOf is Uri) {
+                        glide.centerCrop().centerCrop().into(holder.imgFileType)
+                    } else {
+                        glide.fitCenter().override(Target.SIZE_ORIGINAL).into(holder.imgFileType)
+                    }
                 }
             }
         }
@@ -151,16 +159,8 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     }
     private fun getImage(position: Int, placeholder: Int): Any {
         val item = get(position)
-        if (item.isDirectory) return R.drawable.ic_folder
         if (item.path.endsWith(".apk", true)) {
-            val pi = activity.packageManager.getPackageArchiveInfo(
-                item.path,
-                PackageManager.GET_ACTIVITIES
-            ) ?: return R.drawable.ic_android
-            val ai = pi.applicationInfo
-            ai.sourceDir = item.path
-            ai.publicSourceDir = item.path
-            return ai.loadIcon(activity.packageManager) ?: R.drawable.ic_android
+            return getApkIcon(item.path) ?: R.drawable.ic_android
         } else if (item.path.isImageSlow() || item.path.isVideoSlow()) {
             if (isQPlus() && (item.isAndroidData() || item.isAndroidObb())) {
                 val docFile = DocumentFileCompat.fromFullPath(activity, item.path)
@@ -179,13 +179,27 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         }
         return placeholder
     }
-    private fun getPlaceholder(path: String): Int {
+    private fun getApkIcon(path: String): Bitmap? {
+        var bitmap: Bitmap? = null
+        val pi = activity.packageManager.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES)
+        if (pi != null) {
+            val ai = pi.applicationInfo
+            ai.sourceDir = path
+            ai.publicSourceDir = path
+            val drawable = ai.loadIcon(activity.packageManager)
+            if (drawable != null) bitmap = drawable.toBitmap()
+        }
+        return bitmap
+    }
+    private fun getPlaceholder(item: FileItem): Int {
+        if (item.isDirectory) return R.drawable.ic_folder
+        val path = item.path
         val fileResource = FileResource(path)
         val images = fileResource.getImages()
         return if (images != null) {
             return images
         } else {
-            val mime = path.mimetype.lowercase()
+            val mime = item.path.mimetype.lowercase()
             when {
                 path.isImageSlow() -> R.drawable.ic_image
                 path.isAudioSlow() -> R.drawable.ic_music

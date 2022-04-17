@@ -3,8 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_downloads.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_dropdown.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_open.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_others.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_pdf.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_phone.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_php.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_play.xml" value="0.1265" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_ppt.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_rar.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_recent.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_rename.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_share.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_xlsx.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_xml.xml" value="0.1265" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_zip.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/mini_shape.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_about.xml" value="0.31521739130434784" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_main.xml" value="0.24048913043478262" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_details.xml" value="0.31521739130434784" />

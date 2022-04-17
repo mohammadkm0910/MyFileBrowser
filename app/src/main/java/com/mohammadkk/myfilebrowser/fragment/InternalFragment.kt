@@ -230,7 +230,6 @@ class InternalFragment : BaseFragment(), FileListener {
                 val items = findFiles(storage)
                 mActivity.runOnUiThread {
                     fileAdapter.addAll(items)
-                    mActivity.snackBar(mContext.getInternalStorage().listFiles()?.size.toString())
                 }
             }
         }
