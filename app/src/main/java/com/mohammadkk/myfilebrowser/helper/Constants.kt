@@ -27,8 +27,6 @@ val photoExtensions: Array<String> get() = arrayOf(".jpg", ".png", ".jpeg", ".bm
 val videoExtensions: Array<String> get() = arrayOf(".mp4", ".mkv", ".webm", ".avi", ".3gp", ".mov", ".m4v", ".3gpp")
 val audioExtensions: Array<String> get() = arrayOf(".mp3", ".wav", ".wma", ".ogg", ".m4a", ".opus", ".flac", ".aac")
 
-val extraAudioMimeType = arrayListOf("application/ogg")
-
 val extraDocsMimeType = arrayListOf(
     "application/msword",
     "application/vnd.ms-word.document.macroEnabled.12",
@@ -37,13 +35,7 @@ val extraDocsMimeType = arrayListOf(
     "application/vnd.ms-word.template.macroEnabled.12",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
 )
-val extraDocumentMimeTypes = arrayListOf(
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/javascript"
-)
+
 const val INTENT_EXTRA_URI_NEW_API = "android.provider.extra.INITIAL_URI"
 const val IMAGES = "images"
 const val VIDEOS = "videos"

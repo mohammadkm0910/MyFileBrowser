@@ -11,4 +11,12 @@ object MimetypeUtils {
         "application/x-xz",
         "application/zip"
     )
+    val extraAudioMimeType = arrayListOf("application/ogg")
+    val extraDocumentMimeTypes = arrayListOf(
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/javascript"
+    )
 }

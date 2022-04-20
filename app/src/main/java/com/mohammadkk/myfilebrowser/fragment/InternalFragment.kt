@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.DocumentFileCompat
+import com.mohammadkk.myfilebrowser.BaseConfig
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.adapter.FileAdapter
 import com.mohammadkk.myfilebrowser.adapter.FileListener
@@ -46,7 +47,7 @@ class InternalFragment : BaseFragment(), FileListener {
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { treeUri ->
                     val pathUri = treeUri.path ?: ""
-                    val baseConfig = mContext.baseConfig
+                    val baseConfig = BaseConfig.newInstance(mContext)
                     if (pathUri.endsWith("Android/data") || pathUri.endsWith("Android/obb")) {
                         if (systemNewApi != null) {
                             baseConfig.setUriPath(systemNewApi!!, treeUri)
@@ -176,7 +177,8 @@ class InternalFragment : BaseFragment(), FileListener {
     }
     private fun findFiles(documentFile: DocumentFile?): List<FileItem> {
         val list = ArrayList<FileItem>()
-        documentFile?.listFiles()?.forEach { file ->
+        val listDoc = documentFile?.listFiles() ?: return list
+        listDoc.forEach { file ->
             val name = file?.name ?: return@forEach
             val item = FileItem(
                 name,
@@ -201,7 +203,7 @@ class InternalFragment : BaseFragment(), FileListener {
     }
     override fun displayFiles() {
         val current = storage.toFileItem()
-        val baseConfig = mContext.baseConfig
+        val baseConfig = BaseConfig.newInstance(mContext)
         val currentEnum = mContext.getEnumSystemNewApi(current)
         binding.storageRecycler.setHasFixedSize(true)
         binding.storageRecycler.layoutManager = GridLayoutManager(mContext, 1)
@@ -284,12 +286,14 @@ class InternalFragment : BaseFragment(), FileListener {
     }
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
-            if (deleteFileItem(item)) {
-                mContext.deleteFileMediaStore(item.path)
-                fileAdapter.removeItemAt(position)
-                fileAdapter.refresh()
-                mContext.toast("Deleted!")
-            } else mContext.toast("Couldn't Deleted!")
+            deleteFileItem(item) {
+                if (it) {
+                    mContext.deleteFileMediaStore(item.path)
+                    fileAdapter.removeItemAt(position)
+                    fileAdapter.refresh()
+                    mContext.toast("Deleted!")
+                } else mContext.toast("Couldn't Deleted!")
+            }
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {
@@ -303,8 +307,7 @@ class InternalFragment : BaseFragment(), FileListener {
         }
     }
     private fun createDir(folder: File): Boolean {
-        if (folder.exists())
-            return false
+        if (folder.exists()) return false
         if (folder.mkdir()) {
             mActivity.rescanPaths(arrayOf(folder.absolutePath))
             return true

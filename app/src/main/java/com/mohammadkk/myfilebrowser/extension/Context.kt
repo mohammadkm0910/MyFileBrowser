@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -18,27 +17,23 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.deleteRecursively
-import com.mohammadkk.myfilebrowser.BaseConfig
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.helper.*
 import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
-import kotlin.math.roundToInt
 
 fun FragmentActivity.navigate(fragment: Fragment, isBack: Boolean = false) {
     val ft = supportFragmentManager.beginTransaction()
-    ft.replace(R.id.fragmentContainer, fragment, fragment.tag ?: fragment.toString())
-    if (isBack) ft.addToBackStack(fragment.toString())
+    val tag = fragment.tag ?: fragment.toString()
+    ft.replace(R.id.fragmentContainer, fragment, tag)
+    if (isBack) ft.addToBackStack(tag)
     ft.commit()
 }
 fun Context.getInternalStorage(): File {
@@ -58,7 +53,6 @@ fun Context.getExternalStorage(): File? {
     }
     return if (base != null) File(base) else null
 }
-val Context.baseConfig: BaseConfig get() = BaseConfig.newInstance(this)
 fun Context.isPathPermission(uri: Uri?): Boolean {
     val listUri = arrayListOf<Uri>()
     contentResolver.persistedUriPermissions.forEach {
@@ -66,26 +60,24 @@ fun Context.isPathPermission(uri: Uri?): Boolean {
             listUri.add(it.uri)
         }
     }
-    if (listUri.isNullOrEmpty()) return false
-    return listUri.contains(uri ?: return false)
+    return uri != null && !listUri.isNullOrEmpty() && listUri.contains(uri)
 }
 fun Context.getEnumSystemNewApi(item: FileItem): SystemNewApi? {
-    var enum: SystemNewApi? = null
     val root = compareStorage(item.path)[1]
     if (item.isAndroidDataEnded()) {
         if (root == "0") {
-            enum = SystemNewApi.DATA
+            return SystemNewApi.DATA
         } else if (root == "1") {
-            enum = SystemNewApi.DATA_SD
+            return SystemNewApi.DATA_SD
         }
     } else if (item.isAndroidObbEnded()) {
         if (root == "0") {
-            enum = SystemNewApi.OBB
+            return SystemNewApi.OBB
         } else if (root == "1") {
-            enum = SystemNewApi.OBB_SD
+            return SystemNewApi.OBB_SD
         }
     }
-    return enum
+    return null
 }
 @RequiresApi(Build.VERSION_CODES.Q)
 fun Context.askPermission(target: String, fullPath: String): Intent {
@@ -112,18 +104,9 @@ fun Context.compareStorage(path: String): Array<String> {
     }
     return arrayOf("", "")
 }
-fun Context.deleteDocument(documentFile: DocumentFile?): Boolean {
-    if (documentFile?.isDirectory == true) {
-        return documentFile.deleteRecursively(this)
-    } else if (documentFile?.isFile == true) {
-        return documentFile.delete()
-    }
-    return false
-}
 fun Context.getInternalStoragePublicDirectory(type: String): File {
     val internal = getInternalStorage()
-    val path = internal.absolutePath + "/" + type
-    return File(path)
+    return File(internal.absolutePath + "/" + type)
 }
 fun Context.hasPermission(permission: String): Boolean {
     if (!isMarshmallowPlus()) return true
@@ -150,14 +133,8 @@ private fun doToast(context: Context, message: String, length: Int) {
         }
     } else Toast.makeText(context, message, length).show()
 }
-@ColorInt
-fun Context.getColorOrAlpha(@ColorRes id: Int,  factor: Float = 0.5f): Int {
-    val color = ContextCompat.getColor(this, id)
-    val alpha = (Color.alpha(color) * factor).roundToInt()
-    val red: Int = Color.red(color)
-    val green: Int = Color.green(color)
-    val blue: Int = Color.blue(color)
-    return Color.argb(alpha, red, green, blue)
+fun Context.mColor(@ColorRes id: Int): Int {
+    return ContextCompat.getColor(this, id)
 }
 fun Context.launchRequireIntent(intent: Intent) {
     try {

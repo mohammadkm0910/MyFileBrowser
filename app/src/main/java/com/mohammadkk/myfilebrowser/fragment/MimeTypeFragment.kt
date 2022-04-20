@@ -12,7 +12,6 @@ import com.mohammadkk.myfilebrowser.adapter.FileListener
 import com.mohammadkk.myfilebrowser.databinding.FragmentMimTypeBinding
 import com.mohammadkk.myfilebrowser.extension.*
 import com.mohammadkk.myfilebrowser.helper.*
-import com.mohammadkk.myfilebrowser.helper.MimetypeUtils.archivesMimetype
 import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
 import java.util.*
@@ -70,24 +69,24 @@ class MimeTypeFragment: BaseFragment(), FileListener {
                         }
                     }
                     AUDIOS -> {
-                        if (mimeType == "audio" || extraAudioMimeType.contains(fullMimeType)) {
+                        if (mimeType == "audio" || MimetypeUtils.extraAudioMimeType.contains(fullMimeType)) {
                             fileItems.add(FileItem(name, path, false, size))
                         }
                     }
                     DOCUMENTS -> {
-                        if (mimeType == "text" || extraDocumentMimeTypes.contains(fullMimeType)) {
+                        if (mimeType == "text" || MimetypeUtils.extraDocumentMimeTypes.contains(fullMimeType)) {
                             fileItems.add(FileItem(name, path, false, size))
                         }
                     }
                     ARCHIVES -> {
-                        if (archivesMimetype.contains(fullMimeType)) {
+                        if (MimetypeUtils.archivesMimetype.contains(fullMimeType)) {
                             fileItems.add(FileItem(name, path, false, size))
                         }
                     }
                     OTHERS -> {
                         if (mimeType != "image" && mimeType != "video" && mimeType != "audio" && mimeType != "text" &&
-                            !extraAudioMimeType.contains(fullMimeType) && !extraDocumentMimeTypes.contains(fullMimeType) &&
-                            !archivesMimetype.contains(fullMimeType)
+                            !MimetypeUtils.extraAudioMimeType.contains(fullMimeType) && !MimetypeUtils.archivesMimetype.contains(fullMimeType) &&
+                            !MimetypeUtils.extraDocumentMimeTypes.contains(fullMimeType)
                         ) {
                             fileItems.add(FileItem(name, path, false, size))
                         }
@@ -146,12 +145,14 @@ class MimeTypeFragment: BaseFragment(), FileListener {
     }
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
-            if (deleteFileItem(item)) {
-                mContext.deleteFileMediaStore(item.path)
-                fileAdapter.removeItemAt(position)
-                fileAdapter.refresh()
-                mContext.toast("Deleted!")
-            } else mContext.toast("Couldn't Deleted!")
+            deleteFileItem(item) {
+                if (it) {
+                    mContext.deleteFileMediaStore(item.path)
+                    fileAdapter.removeItemAt(position)
+                    fileAdapter.refresh()
+                    mContext.toast("Deleted!")
+                } else mContext.toast("Couldn't Deleted!")
+            }
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {

@@ -30,7 +30,7 @@
     <string name="others">دیگر</string>
     <string name="recent_files">فایل اخیر:</string>
     <!--dialog permission-->
-    <string name="message_permission">Allow <b>MyFile Browser</b> to access photos, media, and files on your device?</string>
+    <string name="message_permission">لطفاً به برنامه ما اجازه دسترسی به همه فایل‌هایتان را بدهید، شاید بدون آن به خوبی کار نکنم.</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
     <!--action menu-->

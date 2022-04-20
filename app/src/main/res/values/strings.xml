@@ -29,7 +29,7 @@
     <string name="others">Others</string>
     <string name="recent_files">Recent File:</string>
     <!--dialog permission-->
-    <string name="message_permission">Allow <b>MyFile Browser</b> to access photos, media, and files on your device?</string>
+    <string name="message_permission">Please grant our app access to all your files, I might not work well without it.</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
     <!--action menu-->

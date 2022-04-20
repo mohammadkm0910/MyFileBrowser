@@ -148,12 +148,14 @@ class HomeFragment : BaseFragment(), FileListener {
     }
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
-            if (deleteFileItem(item)) {
-                mContext.deleteFileMediaStore(item.path)
-                fileAdapter.removeItemAt(position)
-                fileAdapter.refresh()
-                mContext.toast("Deleted!")
-            } else mContext.toast("Couldn't Deleted!")
+            deleteFileItem(item) {
+                if (it) {
+                    mContext.deleteFileMediaStore(item.path)
+                    fileAdapter.removeItemAt(position)
+                    fileAdapter.refresh()
+                    mContext.toast("Deleted!")
+                } else mContext.toast("Couldn't Deleted!")
+            }
         }
     }
     override fun onShareFile(item: FileItem, position: Int) {

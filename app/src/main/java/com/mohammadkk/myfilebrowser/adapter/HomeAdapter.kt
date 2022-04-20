@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mohammadkk.myfilebrowser.databinding.ListItemsHomeBinding
-import com.mohammadkk.myfilebrowser.extension.getColorOrAlpha
+import com.mohammadkk.myfilebrowser.extension.mColor
 import com.mohammadkk.myfilebrowser.extension.navigate
 import com.mohammadkk.myfilebrowser.fragment.MimeTypeFragment
 import com.mohammadkk.myfilebrowser.model.HomeItems
@@ -21,7 +21,7 @@ class HomeAdapter(private val fragmentActivity: FragmentActivity, private val it
     override fun onBindViewHolder(holder: HomeHolder, position: Int) {
         val item = items.elementAt(position)
         holder.imageHome.setImageResource(item.icon)
-        holder.imageHome.setBackgroundColor(fragmentActivity.getColorOrAlpha(item.fillColor, 0.5f))
+        holder.imageHome.setBackgroundColor(fragmentActivity.mColor(item.fillColor))
         holder.titleHome.text = fragmentActivity.getString(item.name)
         holder.itemView.setOnClickListener {
             fragmentActivity.navigate(MimeTypeFragment.newInstance(item.tag), true)

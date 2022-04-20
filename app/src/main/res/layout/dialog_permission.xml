@@ -15,7 +15,7 @@
         android:padding="8dp"
         android:src="@drawable/ic_folder"
         android:contentDescription="@null"/>
-    <TextView
+    <com.mohammadkk.myfilebrowser.ui.LabelView
         android:id="@+id/textPermission"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

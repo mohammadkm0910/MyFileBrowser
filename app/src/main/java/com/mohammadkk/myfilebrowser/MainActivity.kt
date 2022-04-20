@@ -37,8 +37,9 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
     }
     private fun initNavigation() {
+        val externalStorage = getExternalStorage()
         val cardNavigation = binding.navView.menu.findItem(R.id.cardNavigation)
-        cardNavigation.isVisible = getExternalStorage() != null
+        cardNavigation.isVisible = externalStorage != null
         binding.navView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.homeNavigation -> navigate(HomeFragment.newInstance(), true)
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     } else navigate(InternalFragment.newInstance(path), true)
                 }
                 R.id.cardNavigation -> {
-                    val path = getExternalStorage()!!.absolutePath
+                    val path = externalStorage!!.absolutePath
                     if (visibleFragment is InternalFragment) {
                         val requireFragment = visibleFragment as InternalFragment
                         val base = requireFragment.requireArguments().getString("path_arg", "/") ?: ""

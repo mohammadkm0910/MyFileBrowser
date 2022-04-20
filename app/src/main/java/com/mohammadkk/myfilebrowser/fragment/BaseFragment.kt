@@ -1,11 +1,14 @@
 package com.mohammadkk.myfilebrowser.fragment
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.IBinder
 import android.provider.Settings
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
@@ -17,19 +20,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mohammadkk.myfilebrowser.BuildConfig
 import com.mohammadkk.myfilebrowser.databinding.DialogPermissionBinding
-import com.mohammadkk.myfilebrowser.extension.deleteDocument
 import com.mohammadkk.myfilebrowser.extension.hasPermission
 import com.mohammadkk.myfilebrowser.extension.toast
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import com.mohammadkk.myfilebrowser.helper.isRPlus
 import com.mohammadkk.myfilebrowser.model.FileItem
+import com.mohammadkk.myfilebrowser.service.FileOperand
 import java.io.File
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment(), ServiceConnection {
     private val storagePermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
+    private var fileOperand: FileOperand? = null
     private lateinit var resultActivity : ActivityResultLauncher<Intent>
 
     protected val mContext: Context get() = requireContext()
@@ -44,6 +48,16 @@ abstract class BaseFragment : Fragment() {
                 displayFiles()
             }
         }
+    }
+    override fun onStart() {
+        super.onStart()
+        val intentService = Intent(requireContext(), FileOperand::class.java)
+        requireContext().startService(intentService)
+        requireContext().bindService(intentService, this, Context.BIND_AUTO_CREATE)
+    }
+    override fun onStop() {
+        super.onStop()
+        requireContext().unbindService(this)
     }
     protected fun runTimePermission(rootView: View, callback:()->Unit) {
         if (isRPlus()) {
@@ -99,27 +113,16 @@ abstract class BaseFragment : Fragment() {
         }
         return uri
     }
-    protected fun deleteFileItem(item: FileItem): Boolean {
-        val file = File(item.path)
-        return try {
-            if (isQPlus() && (item.isAndroidData() || item.isAndroidObb())) {
-                val documentFile = DocumentFileCompat.fromFile(requireContext(), file)
-                requireContext().deleteDocument(documentFile)
-            } else {
-                deleteRecursively(file)
-            }
-        } catch (e: Exception) {
-            false
+    protected fun deleteFileItem(item: FileItem, callback: (Boolean) -> Unit) {
+        fileOperand?.deleteForceFile(item) { force ->
+            callback(force)
         }
     }
-    private fun deleteRecursively(file: File): Boolean {
-        if (file.isDirectory) {
-            val files = file.listFiles() ?: return file.delete()
-            for (child in files) {
-                deleteRecursively(child)
-            }
-        }
-        return file.delete()
+    override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+        fileOperand = (p1 as FileOperand.LocalService).getService()
+    }
+    override fun onServiceDisconnected(p0: ComponentName?) {
+        fileOperand = null
     }
     protected abstract fun displayFiles()
 }
