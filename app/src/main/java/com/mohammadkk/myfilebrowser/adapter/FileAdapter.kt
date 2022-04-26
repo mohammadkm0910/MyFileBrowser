@@ -37,13 +37,11 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     RecyclerView.Adapter<FileAdapter.FileViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
     private val mItems = SortedList(FileItem::class.java, object : SortedList.Callback<FileItem>() {
         override fun compare(o1: FileItem?, o2: FileItem?): Int {
-            if (o1 != null && o2 != null) {
-                if (o1.isDirectory != o2.isDirectory) {
-                    return if (o1.isDirectory) -1 else +1
-                }
-                return o1.name.compareTo(o2.name, true)
+            if (o1 == null || o2 == null) return 0
+            if (o1.isDirectory != o2.isDirectory) {
+                return if (o1.isDirectory) -1 else +1
             }
-            return 0
+            return o1.name.compareTo(o2.name, true)
         }
         override fun onInserted(position: Int, count: Int) {
             notifyItemRangeInserted(position, count)

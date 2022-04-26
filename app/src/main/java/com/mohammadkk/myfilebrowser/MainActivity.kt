@@ -8,10 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.mohammadkk.myfilebrowser.databinding.ActivityMainBinding
-import com.mohammadkk.myfilebrowser.extension.getExternalStorage
-import com.mohammadkk.myfilebrowser.extension.getInternalStorage
+import com.mohammadkk.myfilebrowser.extension.externalStorage
 import com.mohammadkk.myfilebrowser.extension.getInternalStoragePublicDirectory
 import com.mohammadkk.myfilebrowser.extension.navigate
+import com.mohammadkk.myfilebrowser.extension.sdcardStorage
 import com.mohammadkk.myfilebrowser.fragment.HomeFragment
 import com.mohammadkk.myfilebrowser.fragment.InternalFragment
 
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         if (savedInstanceState == null) {
             navigate(HomeFragment.newInstance())
-            binding.navView.setCheckedItem(R.id.homeNavigation)
+            binding.navView.setCheckedItem(R.id.homeNav)
         }
         initDrawer()
         initNavigation()
@@ -37,14 +37,14 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
     }
     private fun initNavigation() {
-        val externalStorage = getExternalStorage()
-        val cardNavigation = binding.navView.menu.findItem(R.id.cardNavigation)
-        cardNavigation.isVisible = externalStorage != null
+        val sdStorage = sdcardStorage
+        val cardNavigation = binding.navView.menu.findItem(R.id.cardNav)
+        cardNavigation.isVisible = sdStorage != null
         binding.navView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.homeNavigation -> navigate(HomeFragment.newInstance(), true)
-                R.id.internalNavigation -> {
-                    val path = getInternalStorage().absolutePath
+                R.id.homeNav -> navigate(HomeFragment.newInstance(), true)
+                R.id.internalNav -> {
+                    val path = externalStorage.absolutePath
                     if (visibleFragment is InternalFragment) {
                         val requireFragment = visibleFragment as InternalFragment
                         val base = requireFragment.requireArguments().getString("path_arg", "/") ?: ""
@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
                         } else requireFragment.refreshFragment()
                     } else navigate(InternalFragment.newInstance(path), true)
                 }
-                R.id.cardNavigation -> {
-                    val path = externalStorage!!.absolutePath
+                R.id.cardNav -> {
+                    val path = sdStorage!!.absolutePath
                     if (visibleFragment is InternalFragment) {
                         val requireFragment = visibleFragment as InternalFragment
                         val base = requireFragment.requireArguments().getString("path_arg", "/") ?: ""
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                         } else requireFragment.refreshFragment()
                     } else navigate(InternalFragment.newInstance(path), true)
                 }
-                R.id.downloadNavigation -> {
+                R.id.downloadNav -> {
                     val download = getInternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     val downloadPath = download.absolutePath
                     if (visibleFragment is InternalFragment) {
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                         } else requireFragment.refreshFragment()
                     } else navigate(InternalFragment.newInstance(download.absolutePath), true)
                 }
-                R.id.aboutNavigation -> startActivity(Intent(this, AboutActivity::class.java))
+                R.id.aboutNav -> startActivity(Intent(this, AboutActivity::class.java))
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true

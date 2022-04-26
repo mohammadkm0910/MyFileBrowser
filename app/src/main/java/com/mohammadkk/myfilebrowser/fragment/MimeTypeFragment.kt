@@ -49,12 +49,12 @@ class MimeTypeFragment: BaseFragment(), FileListener {
         )
         mContext.queryCursor(uri, projection) { cursor ->
             try {
-                val fullMimeType = cursor.getStringValue(Files.FileColumns.MIME_TYPE)?.lowercase(Locale.getDefault()) ?:return@queryCursor
-                val name = cursor.getStringValue(Files.FileColumns.DISPLAY_NAME)
+                val fullMimeType = cursor.getStringOrNullVal(Files.FileColumns.MIME_TYPE)?.lowercase(Locale.getDefault()) ?:return@queryCursor
+                val name = cursor.getStringVal(Files.FileColumns.DISPLAY_NAME)
                 if (name.startsWith(".")) return@queryCursor
-                val size = cursor.getLongValue(Files.FileColumns.SIZE)
+                val size = cursor.getLongVal(Files.FileColumns.SIZE)
                 if (size == 0L) return@queryCursor
-                val path = cursor.getStringValue(Files.FileColumns.DATA)
+                val path = cursor.getStringVal(Files.FileColumns.DATA)
                 val mimeType = fullMimeType.substringBefore("/")
 
                 when (typeArgument) {
@@ -124,7 +124,7 @@ class MimeTypeFragment: BaseFragment(), FileListener {
         dialogCreator.detailDialog(item)
     }
     override fun onRenameFile(file: File, position: Int) {
-        dialogCreator.renameDialog(file.name, false) { output, dialog ->
+        dialogCreator.renameDialog(file.name) { output, dialog ->
             var newName = output
             val edtExtension = output.substringAfterLast('.')
             val extension = file.extension

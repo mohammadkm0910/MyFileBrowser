@@ -33,9 +33,9 @@ import java.io.IOException
 class InternalFragment : BaseFragment(), FileListener {
     private lateinit var dialogCreator: DialogCreator
     private lateinit var binding: FragmentInternalBinding
-    private var pathArgument: String? = null
-    private lateinit var launcherIntent: ActivityResultLauncher<Intent>
+    private var pathArgument: String = ""
     private lateinit var storage: File
+    private lateinit var launcherIntent: ActivityResultLauncher<Intent>
     private lateinit var fileAdapter: FileAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,8 +63,8 @@ class InternalFragment : BaseFragment(), FileListener {
                 }
             }
         }
-        arguments?.let { pathArgument = it.getString(PATH_ARG) }
-        pathArgument?.let { storage = File(it) }
+        arguments?.let { pathArgument = it.getString(PATH_ARG) ?: "" }
+        pathArgument.let { if (it.isNotEmpty()) storage = File(it) }
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentInternalBinding.inflate(inflater, container, false)
@@ -79,8 +79,7 @@ class InternalFragment : BaseFragment(), FileListener {
         }
     }
     private fun initSplitStorage() {
-        val currentPath = storage.absolutePath.trim('/')
-        val items = currentPath.split('/')
+        val items = pathArgument.trim('/').split('/')
         val storageAdapter = StorageAdapter(mContext, items)
         storageAdapter.setOnItemClickListener { position ->
             val storageBuilder = StringBuilder()
@@ -265,7 +264,7 @@ class InternalFragment : BaseFragment(), FileListener {
         dialogCreator.detailDialog(item)
     }
     override fun onRenameFile(file: File, position: Int) {
-        dialogCreator.renameDialog(file.name, file.isDirectory) { output, dialog ->
+        dialogCreator.renameDialog(file.name) { output, dialog ->
             var newName = output
             val edtExtension = output.substringAfterLast('.')
             val extension = file.extension

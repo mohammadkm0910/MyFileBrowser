@@ -18,9 +18,10 @@
     <string name="rename">تغییر نام</string>
     <string name="delete">حذف</string>
     <string name="share">اشتراک گذاری</string>
-    <!--dialog creator rename dialog-->
-    <string name="rename_file">Rename File</string>
-    <string name="rename_folder">Rename Folder</string>
+    <!--dialog creator input dialog-->
+    <string name="new_name">نام جدید:</string>
+    <string name="create_new_folder">ایجاد پوشه جدید:</string>
+    <string name="create_new_file">ایجاد فایل جدید:</string>
     <!--home fragment-->
     <string name="images">تصاویر</string>
     <string name="videos">فیلم ها</string>
@@ -29,10 +30,9 @@
     <string name="archives">بایگانی ها</string>
     <string name="others">دیگر</string>
     <string name="recent_files">فایل اخیر:</string>
-    <!--dialog permission-->
+    <!--permission messages-->
     <string name="message_permission">لطفاً به برنامه ما اجازه دسترسی به همه فایل‌هایتان را بدهید، شاید بدون آن به خوبی کار نکنم.</string>
-    <string name="allow">Allow</string>
-    <string name="deny">Deny</string>
+    <string name="message_permission_small">نیاز به مجوز ذخیره سازی!</string>
     <!--action menu-->
     <string name="create">ایجاد کردن</string>
     <string name="create_file">ایجاد فایل</string>
@@ -40,8 +40,6 @@
     <string name="exit">خروج</string>
     <string name="cancel"> لغو کردن</string>
     <string name="enter_name">Enter name</string>
-    <string name="create_new_folder">Create new folder</string>
-    <string name="create_new_file">Create new file</string>
     <string name="name_hint">Name</string>
     <string name="parent_folder_hint">Parent Folder</string>
     <string name="path_file_hint">Path File</string>

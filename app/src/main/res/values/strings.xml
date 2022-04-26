@@ -17,9 +17,10 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
-    <!--dialog creator rename dialog-->
-    <string name="rename_file">Rename File</string>
-    <string name="rename_folder">Rename Folder</string>
+    <!--dialog creator input dialog-->
+    <string name="new_name">New name:</string>
+    <string name="create_new_folder">Create new folder:</string>
+    <string name="create_new_file">Create new file:</string>
     <!--home fragment-->
     <string name="images">Images</string>
     <string name="videos">Videos</string>
@@ -28,10 +29,9 @@
     <string name="archives">Archives</string>
     <string name="others">Others</string>
     <string name="recent_files">Recent File:</string>
-    <!--dialog permission-->
+    <!--permission messages-->
     <string name="message_permission">Please grant our app access to all your files, I might not work well without it.</string>
-    <string name="allow">Allow</string>
-    <string name="deny">Deny</string>
+    <string name="message_permission_small">Require storage permission!</string>
     <!--action menu-->
     <string name="create">Create</string>
     <string name="create_file">Create file</string>
@@ -39,8 +39,6 @@
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
     <string name="enter_name">Enter name</string>
-    <string name="create_new_folder">Create new folder</string>
-    <string name="create_new_file">Create new file</string>
     <string name="name_hint">Name</string>
     <string name="parent_folder_hint">Parent Folder</string>
     <string name="path_file_hint">Path File</string>

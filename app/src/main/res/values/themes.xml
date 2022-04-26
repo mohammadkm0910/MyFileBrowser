@@ -22,7 +22,7 @@
         <item name="cornerSize">@dimen/round_shape_drawable</item>
     </style>
     <style name="ThemeButtonPermission" parent="Widget.MaterialComponents.Button">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:insetTop">0dp</item>

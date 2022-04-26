@@ -3,10 +3,12 @@ package com.mohammadkk.myfilebrowser.helper
 import android.app.Activity
 import android.app.Dialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mohammadkk.myfilebrowser.R
+import com.mohammadkk.myfilebrowser.databinding.DialogCreateBinding
 import com.mohammadkk.myfilebrowser.databinding.DialogDetailsBinding
-import com.mohammadkk.myfilebrowser.databinding.DialogInputBinding
+import com.mohammadkk.myfilebrowser.databinding.DialogRenameBinding
 import com.mohammadkk.myfilebrowser.extension.formatDate
 import com.mohammadkk.myfilebrowser.extension.formatSize
 import com.mohammadkk.myfilebrowser.extension.getPropSize
@@ -63,35 +65,42 @@ class DialogCreator(private val activity: Activity) {
             .create()
             .show()
     }
-    fun renameDialog(name: String, isDirectory: Boolean, callback: (output: String, dialog: Dialog) -> Unit) {
+    fun renameDialog(name: String, callback: (output: String, dialog: Dialog) -> Unit) {
         val alert = MaterialAlertDialogBuilder(activity)
-        val binding = DialogInputBinding.inflate(activity.layoutInflater)
+        val binding = DialogRenameBinding.inflate(activity.layoutInflater)
         binding.editName.setHint(R.string.enter_name)
         binding.editName.setText(name)
         binding.btnOkDialog.setText(android.R.string.ok)
-        binding.btnCancelDialog.setText(android.R.string.cancel)
-        val title = if (isDirectory) R.string.rename_folder else R.string.rename_file
-        alert.setTitle(title).setView(binding.root)
+        alert.setView(binding.root)
         val dialog = alert.create()
+        binding.editName.addTextChangedListener {
+            val newName = it.toString()
+            if (name != newName && newName.isNotEmpty()) {
+                binding.btnOkDialog.isEnabled = true
+                binding.btnOkDialog.alpha = 1.0f
+            } else {
+                binding.btnOkDialog.isEnabled = false
+                binding.btnOkDialog.alpha = 0.5f
+            }
+        }
         binding.btnOkDialog.setOnClickListener {
             callback(binding.editName.editableText.toString(), dialog)
         }
-        binding.btnCancelDialog.setOnClickListener {
+        binding.btnCloseDialog.setOnClickListener {
             dialog.dismiss()
         }
         dialog.show()
     }
     fun createNewInStorageDialog(isFile: Boolean, callback: (output: String, dialog: Dialog) -> Unit) {
         val alert = MaterialAlertDialogBuilder(activity)
-        val binding = DialogInputBinding.inflate(activity.layoutInflater)
+        val binding = DialogCreateBinding.inflate(activity.layoutInflater)
         binding.editName.setHint(R.string.enter_name)
-        binding.btnOkDialog.setText(R.string.create)
-        binding.btnCancelDialog.setText(R.string.cancel)
         if (isFile) {
-            alert.setTitle(R.string.create_new_file).setView(binding.root)
+            alert.setTitle(R.string.create_new_file)
         } else {
-            alert.setTitle(R.string.create_new_folder).setView(binding.root)
+            alert.setTitle(R.string.create_new_folder)
         }
+        alert.setView(binding.root)
         val dialog = alert.create()
         binding.btnOkDialog.setOnClickListener {
             callback(binding.editName.editableText.toString(), dialog)

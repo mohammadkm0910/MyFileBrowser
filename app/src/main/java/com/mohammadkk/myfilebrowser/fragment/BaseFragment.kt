@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.IBinder
 import android.provider.Settings
 import android.view.View
@@ -19,8 +18,8 @@ import com.anggrayudi.storage.file.DocumentFileCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mohammadkk.myfilebrowser.BuildConfig
-import com.mohammadkk.myfilebrowser.databinding.DialogPermissionBinding
-import com.mohammadkk.myfilebrowser.extension.hasPermission
+import com.mohammadkk.myfilebrowser.R
+import com.mohammadkk.myfilebrowser.extension.isExternalStorageManager
 import com.mohammadkk.myfilebrowser.extension.toast
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import com.mohammadkk.myfilebrowser.helper.isRPlus
@@ -42,9 +41,7 @@ abstract class BaseFragment : Fragment(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         resultActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (isRPlus() && Environment.isExternalStorageManager()) {
-                displayFiles()
-            } else if (storagePermissions.any { requireContext().hasPermission(it) }) {
+            if (requireContext().isExternalStorageManager()) {
                 displayFiles()
             }
         }
@@ -60,49 +57,43 @@ abstract class BaseFragment : Fragment(), ServiceConnection {
         requireContext().unbindService(this)
     }
     protected fun runTimePermission(rootView: View, callback:()->Unit) {
-        if (isRPlus()) {
-            if (Environment.isExternalStorageManager()) {
-                callback()
-            } else {
-                val dialogView = DialogPermissionBinding.inflate(layoutInflater)
-                val dialogPermission = MaterialAlertDialogBuilder(requireContext())
-                    .setView(dialogView.root)
-                    .setCancelable(false)
-                    .create()
-                dialogPermission.show()
-                dialogView.btnAllowed.setOnClickListener {
-                    try {
-                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                        intent.addCategory("android.intent.category.DEFAULT")
-                        intent.data = Uri.parse("package:${requireContext().packageName}")
-                        resultActivity.launch(intent)
-                    } catch (e: Exception) {
-                        requireContext().toast(e.message.toString())
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                        resultActivity.launch(intent)
-                    }
-                    dialogPermission.dismiss()
-                }
-                dialogView.btnDenied.setOnClickListener { dialogPermission.dismiss() }
-            }
-        } else if (storagePermissions.any { requireContext().hasPermission(it) }) {
+        if (requireContext().isExternalStorageManager()) {
             callback()
         } else {
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                val results = arrayListOf<Boolean>()
-                permissions.entries.forEach { results.add(it.value) }
-                if (results[0] && results[1]) {
-                    callback()
-                } else {
-                    Snackbar.make(rootView, "Permission Require" , Snackbar.LENGTH_SHORT).setAction("Settings") {
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                            resultActivity.launch(this)
+            if (isRPlus()) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(R.string.message_permission)
+                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        try {
+                            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                            intent.addCategory("android.intent.category.DEFAULT")
+                            intent.data = Uri.parse("package:${requireContext().packageName}")
+                            resultActivity.launch(intent)
+                        } catch (e: Exception) {
+                            requireContext().toast(e.message.toString())
+                            val intent = Intent()
+                            intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+                            resultActivity.launch(intent)
                         }
-                    }.show()
-                }
-            }.launch(storagePermissions)
+                        dialog.dismiss()
+                    }
+                    .setCancelable(false).create().show()
+            } else {
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                    val results = arrayListOf<Boolean>()
+                    permissions.entries.forEach { results.add(it.value) }
+                    if (results[0] && results[1]) {
+                        callback()
+                    } else {
+                        Snackbar.make(rootView, R.string.message_permission_small , Snackbar.LENGTH_SHORT).setAction("Settings") {
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                                resultActivity.launch(this)
+                            }
+                        }.show()
+                    }
+                }.launch(storagePermissions)
+            }
         }
     }
     protected fun uriByFileItem(item: FileItem): Uri {

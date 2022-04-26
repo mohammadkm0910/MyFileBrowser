@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/bg_header_drawer.xml" value="0.129" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/bg_items_file.xml" value="0.2165" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/bg_items_split.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_downloads.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_dropdown.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_image.xml" value="0.188" />
@@ -26,7 +29,8 @@
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/ic_zip.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/drawable/mini_shape.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_about.xml" value="0.31521739130434784" />
-        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_main.xml" value="0.24048913043478262" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_create.xml" value="0.3625" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_details.xml" value="0.31521739130434784" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_input.xml" value="0.31521739130434784" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/dialog_permission.xml" value="0.31521739130434784" />
@@ -40,7 +44,7 @@
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/layout/nav_header.xml" value="0.31521739130434784" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/action_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/menu_main.xml" value="0.18802083333333333" />
-        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/nav_menu.xml" value="0.1" />
+        <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/nav_menu.xml" value="0.18" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/menu/options_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
         <entry key="..\:/Users/mohammad/AndroidStudioProjects/MyFileBrowser/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />

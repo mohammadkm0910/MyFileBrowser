@@ -80,9 +80,9 @@ class HomeFragment : BaseFragment(), FileListener {
             }?.use { cursor ->
                 if (cursor.moveToFirst()) {
                     do {
-                        val path = cursor.getStringValue( MediaStore.Files.FileColumns.DATA)
-                        val name = cursor.getStringValue( MediaStore.Files.FileColumns.DISPLAY_NAME) ?: path.substringAfterLast('/')
-                        val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
+                        val path = cursor.getStringVal( MediaStore.Files.FileColumns.DATA)
+                        val name = cursor.getStringOrNullVal( MediaStore.Files.FileColumns.DISPLAY_NAME) ?: path.substringAfterLast('/')
+                        val size = cursor.getLongVal(MediaStore.Files.FileColumns.SIZE)
                         if (!name.startsWith('.')) {
                             fileItems.add(
                                 FileItem(name, path, File(path).isDirectory, size)
@@ -127,7 +127,7 @@ class HomeFragment : BaseFragment(), FileListener {
         dialogCreator.detailDialog(item)
     }
     override fun onRenameFile(file: File, position: Int) {
-        dialogCreator.renameDialog(file.name, file.isDirectory) { output, dialog ->
+        dialogCreator.renameDialog(file.name) { output, dialog ->
             var newName = output
             val edtExtension = output.substringAfterLast('.')
             val extension = file.extension

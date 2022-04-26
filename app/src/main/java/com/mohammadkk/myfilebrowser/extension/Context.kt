@@ -1,5 +1,6 @@
 package com.mohammadkk.myfilebrowser.extension
 
+import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
@@ -36,23 +37,29 @@ fun FragmentActivity.navigate(fragment: Fragment, isBack: Boolean = false) {
     if (isBack) ft.addToBackStack(tag)
     ft.commit()
 }
-fun Context.getInternalStorage(): File {
-    val dir = getExternalFilesDirs(null)[0]
-    var path = dir.absolutePath
-    path = path.substring(0, path.indexOf("Android/data"))
-    path = path.trimEnd('/')
-    return File(path)
-}
-fun Context.getExternalStorage(): File? {
-    var base: String? = null
-    for (file in externalCacheDirs) {
-        if (Environment.isExternalStorageRemovable(file)) {
-            base = file.path.split("/Android")[0]
-            break
+val Context.externalStorage: File
+    get() {
+        var external = Environment.getExternalStorageDirectory()
+        if (external == null) {
+            val dir = getExternalFilesDirs(null)[0]
+            var path = dir.absolutePath
+            path = path.substring(0, path.indexOf("Android/data"))
+            path = path.trimEnd('/')
+            external = File(path)
         }
+        return external
     }
-    return if (base != null) File(base) else null
-}
+val Context.sdcardStorage: File?
+    get() {
+        var base: String? = null
+        for (file in externalCacheDirs) {
+            if (Environment.isExternalStorageRemovable(file)) {
+                base = file.path.split("/Android")[0]
+                break
+            }
+        }
+        return if (base != null) File(base) else null
+    }
 fun Context.isPathPermission(uri: Uri?): Boolean {
     val listUri = arrayListOf<Uri>()
     contentResolver.persistedUriPermissions.forEach {
@@ -95,8 +102,8 @@ fun Context.askPermission(target: String, fullPath: String): Intent {
     return intent
 }
 fun Context.compareStorage(path: String): Array<String> {
-    val internal = getInternalStorage().absolutePath
-    val external = getExternalStorage()?.absolutePath ?: return arrayOf(internal, "0")
+    val internal = externalStorage.absolutePath
+    val external = sdcardStorage?.absolutePath ?: return arrayOf(internal, "0")
     if (path.startsWith(internal)) {
         return arrayOf(internal, "0")
     } else if (path.startsWith(external)) {
@@ -105,12 +112,20 @@ fun Context.compareStorage(path: String): Array<String> {
     return arrayOf("", "")
 }
 fun Context.getInternalStoragePublicDirectory(type: String): File {
-    val internal = getInternalStorage()
+    val internal = externalStorage
     return File(internal.absolutePath + "/" + type)
 }
 fun Context.hasPermission(permission: String): Boolean {
     if (!isMarshmallowPlus()) return true
     return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+}
+fun Context.isExternalStorageManager(): Boolean {
+    return if (isRPlus()) {
+        Environment.isExternalStorageManager()
+    } else {
+        hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
 }
 fun Context.toast(@StringRes id: Int, length: Int = Toast.LENGTH_SHORT) {
     toast(getString(id), length)
