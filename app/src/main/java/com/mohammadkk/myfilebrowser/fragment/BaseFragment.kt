@@ -19,8 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mohammadkk.myfilebrowser.BuildConfig
 import com.mohammadkk.myfilebrowser.R
-import com.mohammadkk.myfilebrowser.extension.isExternalStorageManager
-import com.mohammadkk.myfilebrowser.extension.toast
+import com.mohammadkk.myfilebrowser.extension.*
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import com.mohammadkk.myfilebrowser.helper.isRPlus
 import com.mohammadkk.myfilebrowser.model.FileItem
@@ -96,10 +95,10 @@ abstract class BaseFragment : Fragment(), ServiceConnection {
             }
         }
     }
-    protected fun uriByFileItem(item: FileItem): Uri {
-        var uri = item.parsUri(requireContext())
-        if (isQPlus() && (item.isAndroidData() || item.isAndroidObb())) {
-            val docFile = DocumentFileCompat.fromFile(requireContext(), File(item.path))
+    protected fun uriByFilePath(path: String): Uri {
+        var uri = File(path).providerUri(requireContext())
+        if (isQPlus() && (path.isAndroidData() || path.isAndroidObb())) {
+            val docFile = DocumentFileCompat.fromFile(requireContext(), File(path))
             if (docFile != null) uri = docFile.uri
         }
         return uri

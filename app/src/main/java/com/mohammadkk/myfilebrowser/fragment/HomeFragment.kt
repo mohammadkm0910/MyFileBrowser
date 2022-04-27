@@ -117,7 +117,7 @@ class HomeFragment : BaseFragment(), FileListener {
         }
         Intent().apply {
             action = Intent.ACTION_VIEW
-            setDataAndType(uriByFileItem(item), item.path.mimetype)
+            setDataAndType(uriByFilePath(item.path), item.path.mimetype)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             mContext.launchRequireIntent(this)
@@ -149,7 +149,7 @@ class HomeFragment : BaseFragment(), FileListener {
     override fun onDeleteFile(item: FileItem, position: Int) {
         dialogCreator.deleteDialog(item.name) {
             deleteFileItem(item) {
-                if (it) {
+                if (it || !item.isExists()) {
                     mContext.deleteFileMediaStore(item.path)
                     fileAdapter.removeItemAt(position)
                     fileAdapter.refresh()
@@ -162,7 +162,7 @@ class HomeFragment : BaseFragment(), FileListener {
         Intent().apply {
             action = Intent.ACTION_SEND
             type = item.path.mimetype
-            putExtra(Intent.EXTRA_STREAM, uriByFileItem(item))
+            putExtra(Intent.EXTRA_STREAM, uriByFilePath(item.path))
             mContext.launchRequireIntent(
                 Intent.createChooser(this,"share ${item.name}")
             )

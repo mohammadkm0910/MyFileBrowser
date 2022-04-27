@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.*
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.anggrayudi.storage.file.forceDelete
+import com.mohammadkk.myfilebrowser.extension.isAndroidData
+import com.mohammadkk.myfilebrowser.extension.isAndroidObb
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
@@ -31,7 +33,7 @@ class FileOperand : Service() {
     }
     private fun deleteFileItem(item: FileItem): Boolean {
         val file = File(item.path)
-        return if (isQPlus() && (item.isAndroidData() || item.isAndroidObb())) {
+        return if (isQPlus() && (item.path.isAndroidData() || item.path.isAndroidObb())) {
             val documentFile = DocumentFileCompat.fromFile(baseContext, file)
             documentFile?.forceDelete(baseContext) == true
         } else {

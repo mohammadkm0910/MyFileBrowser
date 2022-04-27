@@ -16,6 +16,8 @@ fun Long.formatSize(isThousand: Boolean = true): String {
     return "${df.format(this / base.pow(index.toDouble()))} ${units[index]}"
 }
 fun Long.formatDate(locale: Locale = Locale.getDefault()): String {
-    val simpleFormatter = SimpleDateFormat("dd/mm/yyyy HH:mm:ss", locale)
+    val pattern = "yyyy-MM-dd hh:mm:ss a"
+    val simpleFormatter = SimpleDateFormat(pattern, locale)
+    simpleFormatter.timeZone = TimeZone.getDefault()
     return simpleFormatter.format(Date(this))
 }

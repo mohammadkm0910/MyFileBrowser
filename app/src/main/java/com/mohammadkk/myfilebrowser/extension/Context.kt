@@ -27,7 +27,6 @@ import androidx.fragment.app.FragmentActivity
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.helper.*
-import com.mohammadkk.myfilebrowser.model.FileItem
 import java.io.File
 
 fun FragmentActivity.navigate(fragment: Fragment, isBack: Boolean = false) {
@@ -69,15 +68,15 @@ fun Context.isPathPermission(uri: Uri?): Boolean {
     }
     return uri != null && !listUri.isNullOrEmpty() && listUri.contains(uri)
 }
-fun Context.getEnumSystemNewApi(item: FileItem): SystemNewApi? {
-    val root = compareStorage(item.path)[1]
-    if (item.isAndroidDataEnded()) {
+fun Context.getEnumSystemNewApi(path: String): SystemNewApi? {
+    val root = compareStorage(path)[1]
+    if (path.isAndroidDataEnded()) {
         if (root == "0") {
             return SystemNewApi.DATA
         } else if (root == "1") {
             return SystemNewApi.DATA_SD
         }
-    } else if (item.isAndroidObbEnded()) {
+    } else if (path.isAndroidObbEnded()) {
         if (root == "0") {
             return SystemNewApi.OBB
         } else if (root == "1") {

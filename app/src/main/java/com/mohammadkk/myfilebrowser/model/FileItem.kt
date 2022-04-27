@@ -4,7 +4,8 @@ import android.content.Context
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.mohammadkk.myfilebrowser.extension.formatSize
 import com.mohammadkk.myfilebrowser.extension.getCountChild
-import com.mohammadkk.myfilebrowser.extension.providerUri
+import com.mohammadkk.myfilebrowser.extension.isAndroidData
+import com.mohammadkk.myfilebrowser.extension.isAndroidObb
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import java.io.File
 import java.io.Serializable
@@ -15,24 +16,9 @@ data class FileItem(
     val isDirectory: Boolean,
     val size: Long
 ) : Serializable {
-    fun parsUri(context: Context) = File(path).providerUri(context)
-    fun isAndroidDataEnded() = path.endsWith("/Android/data")
-    fun isAndroidObbEnded() = path.endsWith("/Android/obb")
-    fun isAndroidData(): Boolean {
-        val basePath = path.substringBefore( "/Android/data")
-        return path.startsWith("$basePath/Android/data")
-    }
-    fun isAndroidObb(): Boolean {
-        val basePath = path.substringBefore( "/Android/obb")
-        return path.startsWith("$basePath/Android/obb")
-    }
-    fun systemDir() = when {
-        isAndroidDataEnded() -> "Android/data"
-        isAndroidObbEnded() -> "Android/obb"
-        else -> ""
-    }
+    fun isExists() = File(path).exists()
     fun getSize(context: Context): String {
-        val isSystem = (isAndroidData() || isAndroidObb()) && isQPlus()
+        val isSystem = (path.isAndroidData() || path.isAndroidObb()) && isQPlus()
         val file = File(path)
         return if (isSystem) {
             val documentFile = DocumentFileCompat.fromFile(context, file)

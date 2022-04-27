@@ -112,15 +112,12 @@ class InternalFragment : BaseFragment(), FileListener {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.action_menu, menu)
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val dc = DialogCreator(requireActivity())
         when (item.itemId) {
             R.id.createFileOption -> {
                 dc.createNewInStorageDialog(true) { output, dialog ->
-                    if (output.isEmpty || !output.isAValidFilename()) {
-                        mContext.toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
-                    } else {
+                    if (!isNotValidFileName(output)) {
                         val newPath = "${storage.absolutePath.trimEnd('/')}/$output"
                         val newFile = File(newPath)
                         if (newFile.exists()) {
@@ -140,9 +137,7 @@ class InternalFragment : BaseFragment(), FileListener {
             }
             R.id.createFolderOption -> {
                 dc.createNewInStorageDialog(false) { output, dialog ->
-                    if (output.isEmpty || !output.isAValidFilename()) {
-                        mContext.toast(if (output.isEmpty) R.string.empty_name else R.string.invalid_name)
-                    } else {
+                    if (!isNotValidFileName(output)) {
                         val newPath = "${storage.absolutePath.trimEnd('/')}/$output"
                         val newFolder = File(newPath)
                         if (newFolder.exists()) {
@@ -167,6 +162,16 @@ class InternalFragment : BaseFragment(), FileListener {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    private fun isNotValidFileName(name: String): Boolean {
+        if (name.trim().isEmpty()) {
+            mContext.toast(R.string.empty_name)
+            return true
+        } else if (!name.isAValidFilename()) {
+            mContext.toast(R.string.invalid_name)
+            return true
+        }
+        return false
     }
     private fun findFiles(file: File): ArrayList<FileItem> {
         val list = arrayListOf<FileItem>()
@@ -201,15 +206,14 @@ class InternalFragment : BaseFragment(), FileListener {
         }
     }
     override fun displayFiles() {
-        val current = storage.toFileItem()
         val baseConfig = BaseConfig.newInstance(mContext)
-        val currentEnum = mContext.getEnumSystemNewApi(current)
+        val currentEnum = mContext.getEnumSystemNewApi(pathArgument)
         binding.storageRecycler.setHasFixedSize(true)
         binding.storageRecycler.layoutManager = GridLayoutManager(mContext, 1)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
         binding.storageRecycler.adapter = fileAdapter
-        if (isQPlus() && current.systemDir().isNotEmpty()) {
-            val intent = mContext.askPermission(current.systemDir(), current.path)
+        if (isQPlus() && pathArgument.systemDir().isNotEmpty()) {
+            val intent = mContext.askPermission(pathArgument.systemDir(), pathArgument)
             val uri = baseConfig.getUriPath(currentEnum)
             if (uri != null && mContext.isPathPermission(uri)) {
                 val doc = DocumentFile.fromTreeUri(mContext, uri)
@@ -220,7 +224,7 @@ class InternalFragment : BaseFragment(), FileListener {
             }
             return
         }
-        if (current.isAndroidData() || current.isAndroidObb()) {
+        if (pathArgument.isAndroidData() || pathArgument.isAndroidObb()) {
             val documentFile = DocumentFileCompat.fromFile(mContext, storage)
             displayDocumentFiles(documentFile)
             return
@@ -253,7 +257,7 @@ class InternalFragment : BaseFragment(), FileListener {
         } else {
             Intent().apply {
                 action = Intent.ACTION_VIEW
-                setDataAndType(uriByFileItem(item), item.path.mimetype)
+                setDataAndType(uriByFilePath(item.path), item.path.mimetype)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                 mContext.launchRequireIntent(this)
@@ -299,7 +303,7 @@ class InternalFragment : BaseFragment(), FileListener {
         Intent().apply {
             action = Intent.ACTION_SEND
             type = item.path.mimetype
-            putExtra(Intent.EXTRA_STREAM, uriByFileItem(item))
+            putExtra(Intent.EXTRA_STREAM, uriByFilePath(item.path))
             mContext.launchRequireIntent(
                 Intent.createChooser(this,"share ${item.name}")
             )

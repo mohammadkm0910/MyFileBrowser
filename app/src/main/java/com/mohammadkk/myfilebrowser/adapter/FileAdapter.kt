@@ -23,7 +23,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.extension.*
-import com.mohammadkk.myfilebrowser.helper.FileResource
+import com.mohammadkk.myfilebrowser.helper.MimetypeUtils
 import com.mohammadkk.myfilebrowser.helper.extraDocsMimeType
 import com.mohammadkk.myfilebrowser.helper.isQPlus
 import com.mohammadkk.myfilebrowser.model.FileItem
@@ -160,7 +160,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         if (item.path.endsWith(".apk", true)) {
             return getApkIcon(item.path) ?: R.drawable.ic_android
         } else if (item.path.isImageSlow() || item.path.isVideoSlow()) {
-            if (isQPlus() && (item.isAndroidData() || item.isAndroidObb())) {
+            if (isQPlus() && (item.path.isAndroidData() || item.path.isAndroidObb())) {
                 val docFile = DocumentFileCompat.fromFullPath(activity, item.path)
                 if (docFile != null) return docFile.uri
             } else return item.path
@@ -173,7 +173,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
                 mmr.release()
             } catch (e: Exception) {
             }
-            return art ?: FileResource(item.path).getMusicIcon()
+            return art ?: MimetypeUtils.getMusicIcon(item.path)
         }
         return placeholder
     }
@@ -192,8 +192,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     private fun getPlaceholder(item: FileItem): Int {
         if (item.isDirectory) return R.drawable.ic_folder
         val path = item.path
-        val fileResource = FileResource(path)
-        val images = fileResource.getImages()
+        val images = MimetypeUtils.getImageResource(path.extension)
         return if (images != null) {
             return images
         } else {
