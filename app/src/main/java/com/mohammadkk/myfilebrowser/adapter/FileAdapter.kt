@@ -11,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +32,6 @@ import com.mohammadkk.myfilebrowser.model.FileItem
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import kotlinx.coroutines.*
 import java.io.File
-import java.lang.reflect.Method
 
 
 class FileAdapter(private val activity: Activity, private val isGrid: Boolean = false, private val listener: FileListener) :
@@ -123,34 +124,28 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
             itemClick?.invoke(file)
         }
         holder.itemView.setOnLongClickListener {
-            val currFile = File(get(position).path)
-            val popup = PopupMenu(activity, holder.itemView)
-            popup.menuInflater.inflate(R.menu.options_menu,popup.menu)
-            try {
-                val classPopupMenu = Class.forName(popup.javaClass.name)
-                val mPopup = classPopupMenu.getDeclaredField("mPopup")
-                mPopup.isAccessible = true
-                val menuPopupHelper = mPopup.get(popup)
-                val classPopupHelper = Class.forName(menuPopupHelper.javaClass.name)
-                val setForceIcons: Method = classPopupHelper.getMethod(
-                    "setForceShowIcon", Boolean::class.javaPrimitiveType
-                )
-                setForceIcons.invoke(menuPopupHelper, true)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            popup.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.detailOption -> listener.onOpenDetailDialog(get(position), position)
-                    R.id.renameOption -> listener.onRenameFile(currFile, position)
-                    R.id.deleteOption -> listener.onDeleteFile(get(position), position)
-                    R.id.shareOption -> listener.onShareFile(get(position), position)
-                }
-                true
-            }
-            popup.show()
+            createPopup(holder.itemView, position)
             true
         }
+    }
+    @SuppressLint("RestrictedApi")
+    private fun createPopup(view: View, position: Int) {
+        val currItem = get(position)
+        val currFile = File(currItem.path)
+        val popup = PopupMenu(activity, view)
+        popup.inflate(R.menu.options_menu)
+        val menuHelper = MenuPopupHelper(activity, popup.menu as MenuBuilder, view)
+        menuHelper.setForceShowIcon(true)
+        popup.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.detailOption -> listener.onOpenDetailDialog(currItem, position)
+                R.id.renameOption -> listener.onRenameFile(currFile, position)
+                R.id.deleteOption -> listener.onDeleteFile(currItem, position)
+                R.id.shareOption -> listener.onShareFile(currItem, position)
+            }
+            true
+        }
+        menuHelper.show()
     }
     fun setOnItemClick(listener: (item: FileItem) -> Unit) {
         itemClick = listener
@@ -207,7 +202,6 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
             }
         }
     }
-    @SuppressLint("NotifyDataSetChanged")
     fun refresh() {
         for (i in 0 until mItems.size())
             notifyItemChanged(i)
