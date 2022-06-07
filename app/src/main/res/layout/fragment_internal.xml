@@ -21,15 +21,16 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:background="@color/grey_200"/>
+
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-        android:id="@+id/storageRecycler"
+        android:id="@+id/rvFiles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/divider"
         app:fastScrollPopupBgColor="@color/pink_400"
-        app:fastScrollTrackColor="@color/grey_300"
+        app:fastScrollThumbColor="@color/blue_A400"
         app:fastScrollThumbInactiveColor="@color/light_blue_500"
-        app:fastScrollThumbColor="@color/blue_A400"/>
+        app:fastScrollTrackColor="@color/grey_300" />
     <LinearLayout
         android:id="@+id/restrictionLayout"
         android:layout_width="match_parent"

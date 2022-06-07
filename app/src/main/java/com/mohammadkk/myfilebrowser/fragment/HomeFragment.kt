@@ -3,8 +3,6 @@ package com.mohammadkk.myfilebrowser.fragment
 import android.content.ContentResolver
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +19,10 @@ import com.mohammadkk.myfilebrowser.extension.*
 import com.mohammadkk.myfilebrowser.helper.*
 import com.mohammadkk.myfilebrowser.model.FileItem
 import com.mohammadkk.myfilebrowser.model.HomeItems
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class HomeFragment : BaseFragment(), FileListener {
@@ -45,8 +47,8 @@ class HomeFragment : BaseFragment(), FileListener {
         }
     }
     private fun displayGridHome() {
-        binding.gridHomeRecycler.layoutManager = GridLayoutManager(mContext, resources.getInteger(
-            R.integer.grid_home_span))
+        val span = if (mContext.isLandscape || mContext.isTablet) 6 else 3
+        binding.rvHomeGrid.layoutManager = GridLayoutManager(mContext, span)
         val items = mutableSetOf(
             HomeItems(R.string.images, R.drawable.ic_image, R.color.image_holder, IMAGES),
             HomeItems(R.string.videos, R.drawable.ic_play, R.color.play_holder, VIDEOS),
@@ -55,7 +57,7 @@ class HomeFragment : BaseFragment(), FileListener {
             HomeItems(R.string.archives, R.drawable.ic_archives, R.color.archives_holder, ARCHIVES),
             HomeItems(R.string.others, R.drawable.ic_others, R.color.others_holder, OTHERS)
         )
-        binding.gridHomeRecycler.adapter = HomeAdapter(mActivity, items)
+        binding.rvHomeGrid.adapter = HomeAdapter(mActivity, items)
     }
     private fun findRecentFiles(): List<FileItem> {
         val fileItems = arrayListOf<FileItem>()
@@ -104,8 +106,19 @@ class HomeFragment : BaseFragment(), FileListener {
         ensureBackgroundThread {
             runCatching {
                 val items = findRecentFiles()
-                Handler(Looper.getMainLooper()).post {
+                mActivity.runOnUiThread {
                     fileAdapter.addAll(items)
+                }
+            }
+        }
+    }
+    fun refreshFragment() {
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                val items = findRecentFiles()
+                withContext(Dispatchers.Main) {
+                    fileAdapter.clear()
+                    items.forEach { fileAdapter.add(it) }
                 }
             }
         }

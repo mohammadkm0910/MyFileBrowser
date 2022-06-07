@@ -7,6 +7,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -25,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.inSdCardStorage
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.helper.*
 import java.io.File
@@ -36,6 +38,8 @@ fun FragmentActivity.navigate(fragment: Fragment, isBack: Boolean = false) {
     if (isBack) ft.addToBackStack(tag)
     ft.commit()
 }
+val Context.isLandscape get() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+val Context.isTablet get() = resources.configuration.smallestScreenWidthDp >= 600
 val Context.externalStorage: File
     get() {
         var external = Environment.getExternalStorageDirectory()
@@ -66,22 +70,14 @@ fun Context.isPathPermission(uri: Uri?): Boolean {
             listUri.add(it.uri)
         }
     }
-    return uri != null && !listUri.isNullOrEmpty() && listUri.contains(uri)
+    return uri != null && listUri.isNotEmpty() && listUri.contains(uri)
 }
 fun Context.getEnumSystemNewApi(path: String): SystemNewApi? {
-    val root = compareStorage(path)[1]
+    val isSdcard = File(path).inSdCardStorage(this)
     if (path.isAndroidDataEnded()) {
-        if (root == "0") {
-            return SystemNewApi.DATA
-        } else if (root == "1") {
-            return SystemNewApi.DATA_SD
-        }
+        return if (isSdcard) SystemNewApi.DATA_SD else SystemNewApi.DATA
     } else if (path.isAndroidObbEnded()) {
-        if (root == "0") {
-            return SystemNewApi.OBB
-        } else if (root == "1") {
-            return SystemNewApi.OBB_SD
-        }
+        return if (isSdcard) SystemNewApi.OBB_SD else SystemNewApi.OBB
     }
     return null
 }
@@ -100,17 +96,7 @@ fun Context.askPermission(target: String, fullPath: String): Intent {
     intent.putExtra(INTENT_EXTRA_URI_NEW_API, Uri.parse(scheme))
     return intent
 }
-fun Context.compareStorage(path: String): Array<String> {
-    val internal = externalStorage.absolutePath
-    val external = sdcardStorage?.absolutePath ?: return arrayOf(internal, "0")
-    if (path.startsWith(internal)) {
-        return arrayOf(internal, "0")
-    } else if (path.startsWith(external)) {
-        return arrayOf(external, "1")
-    }
-    return arrayOf("", "")
-}
-fun Context.getInternalStoragePublicDirectory(type: String): File {
+fun Context.getExternalStoragePublicDir(type: String): File {
     val internal = externalStorage
     return File(internal.absolutePath + "/" + type)
 }

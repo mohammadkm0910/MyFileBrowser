@@ -89,7 +89,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         val uiDispatcher = Dispatchers.Main
         val ioDispatcher = Dispatchers.IO + executorJOB + handlerExc
         val uiScope = CoroutineScope(uiDispatcher)
-        val file = get(position)
+        val file = mItems[position]
         holder.tvFileName.fixSetText(file.name)
         if (!isGrid) {
             uiScope.launch {
@@ -104,7 +104,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
         uiScope.launch {
             withContext(ioDispatcher) {
                 val placeholder = getPlaceholder(file)
-                val imageOf = getImage(position, placeholder)
+                val imageOf = getImage(file, placeholder)
                 withContext(uiDispatcher) {
                     val glide = Glide.with(activity)
                         .load(imageOf)
@@ -130,7 +130,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     }
     @SuppressLint("RestrictedApi")
     private fun createPopup(view: View, position: Int) {
-        val currItem = get(position)
+        val currItem = mItems[position]
         val currFile = File(currItem.path)
         val popup = PopupMenu(activity, view)
         popup.inflate(R.menu.options_menu)
@@ -150,8 +150,7 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     fun setOnItemClick(listener: (item: FileItem) -> Unit) {
         itemClick = listener
     }
-    private fun getImage(position: Int, placeholder: Int): Any {
-        val item = get(position)
+    private fun getImage(item: FileItem, placeholder: Int): Any {
         if (item.path.endsWith(".apk", true)) {
             return getApkIcon(item.path) ?: R.drawable.ic_android
         } else if (item.path.isImageSlow() || item.path.isVideoSlow()) {
@@ -226,7 +225,6 @@ class FileAdapter(private val activity: Activity, private val isGrid: Boolean = 
     fun removeItemAt(index: Int): FileItem {
         return mItems.removeItemAt(index)
     }
-    fun get(position: Int): FileItem = mItems[position]
     override fun getItemCount(): Int {
         return mItems.size()
     }

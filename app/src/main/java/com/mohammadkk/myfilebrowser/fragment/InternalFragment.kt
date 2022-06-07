@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.getRootPath
+import com.anggrayudi.storage.file.inSdCardStorage
 import com.mohammadkk.myfilebrowser.BaseConfig
 import com.mohammadkk.myfilebrowser.R
 import com.mohammadkk.myfilebrowser.adapter.FileAdapter
@@ -22,11 +24,9 @@ import com.mohammadkk.myfilebrowser.adapter.FileListener
 import com.mohammadkk.myfilebrowser.adapter.StorageAdapter
 import com.mohammadkk.myfilebrowser.databinding.FragmentInternalBinding
 import com.mohammadkk.myfilebrowser.extension.*
-import com.mohammadkk.myfilebrowser.helper.DialogCreator
-import com.mohammadkk.myfilebrowser.helper.SystemNewApi
-import com.mohammadkk.myfilebrowser.helper.ensureBackgroundThread
-import com.mohammadkk.myfilebrowser.helper.isQPlus
+import com.mohammadkk.myfilebrowser.helper.*
 import com.mohammadkk.myfilebrowser.model.FileItem
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
 import java.io.File
 import java.io.IOException
 
@@ -63,7 +63,7 @@ class InternalFragment : BaseFragment(), FileListener {
                 }
             }
         }
-        arguments?.let { pathArgument = it.getString(PATH_ARG) ?: "" }
+        arguments?.let { pathArgument = it.getString(PATH_ARG_FRAG) ?: "" }
         pathArgument.let { if (it.isNotEmpty()) storage = File(it) }
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -79,14 +79,20 @@ class InternalFragment : BaseFragment(), FileListener {
         }
     }
     private fun initSplitStorage() {
-        val items = pathArgument.trim('/').split('/')
+        val root = storage.getRootPath(mContext)
+        val basePath = pathArgument.substringAfter(root, "").trim('/')
+        val isPrimary = !storage.inSdCardStorage(mContext)
+        val str = if (isPrimary) "Main Storage" else "SD Card"
+        val mainPath = if (basePath.isEmpty()) str else "$str/$basePath"
+        val items = mainPath.split('/')
         val storageAdapter = StorageAdapter(mContext, items)
         storageAdapter.setOnItemClickListener { position ->
-            val storageBuilder = StringBuilder()
-            for (index in 0..position) {
-                storageBuilder.append("/${items[index]}")
+            val result = StringBuilder()
+            result.append(root)
+            for (index in 1..position) {
+                result.append("/${items[index]}")
             }
-            mActivity.navigate(newInstance(storageBuilder.toString()))
+            mActivity.navigate(newInstance(result.toString()))
         }
         val layout = LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false)
         binding.splitRecycler.layoutManager = layout
@@ -95,13 +101,13 @@ class InternalFragment : BaseFragment(), FileListener {
     fun refreshFragment() {
         ensureBackgroundThread {
             try {
-                val fileList = findFiles(storage)
+                val fileList = findFiles(null, false)
                 mActivity.runOnUiThread {
                     fileAdapter.clear()
                     fileAdapter.addAll(fileList)
                     fileAdapter.refresh()
                     scrollState?.also {
-                        getLayoutList(binding.storageRecycler).onRestoreInstanceState(it)
+                        getLayoutList(binding.rvFiles).onRestoreInstanceState(it)
                     }
                 }
             } catch (e: Exception) {}
@@ -173,24 +179,22 @@ class InternalFragment : BaseFragment(), FileListener {
         }
         return false
     }
-    private fun findFiles(file: File): ArrayList<FileItem> {
-        val list = arrayListOf<FileItem>()
-        val files = file.listFiles()?.filter { !it.isHidden }
-        files?.forEach { list.add(it.toFileItem()) }
-        return list
-    }
-    private fun findFiles(documentFile: DocumentFile?): List<FileItem> {
+    private fun findFiles(df: DocumentFile?, isDF: Boolean): ArrayList<FileItem> {
         val list = ArrayList<FileItem>()
-        val listDoc = documentFile?.listFiles() ?: return list
-        listDoc.forEach { file ->
-            val name = file?.name ?: return@forEach
-            val item = FileItem(
-                name,
-                "${storage.absolutePath}/$name",
-                file.isDirectory,
-                file.length()
-            )
-            list.add(item)
+        if (isDF) {
+            df?.listFiles()?.forEach { file ->
+                val name = file?.name ?: return@forEach
+                val item = FileItem(
+                    name,
+                    "${storage.absolutePath}/$name",
+                    file.isDirectory,
+                    file.length()
+                )
+                list.add(item)
+            }
+        } else {
+            val files = storage.listFiles()?.filter { !it.isHidden }
+            files?.forEach { list.add(it.toFileItem()) }
         }
         return list
     }
@@ -198,7 +202,7 @@ class InternalFragment : BaseFragment(), FileListener {
         binding.restrictionLayout.isVisible = documentFile?.listFiles().isNullOrEmpty()
         ensureBackgroundThread {
             runCatching {
-                val items = findFiles(documentFile)
+                val items = findFiles(documentFile, true)
                 Handler(Looper.getMainLooper()).post {
                     fileAdapter.addAll(items)
                 }
@@ -208,10 +212,11 @@ class InternalFragment : BaseFragment(), FileListener {
     override fun displayFiles() {
         val baseConfig = BaseConfig.newInstance(mContext)
         val currentEnum = mContext.getEnumSystemNewApi(pathArgument)
-        binding.storageRecycler.setHasFixedSize(true)
-        binding.storageRecycler.layoutManager = GridLayoutManager(mContext, 1)
+        binding.rvFiles.setHasFixedSize(true)
+        binding.rvFiles.setItemViewCacheSize(10)
+        binding.rvFiles.layoutManager = GridLayoutManager(mContext, 1)
         fileAdapter.setOnItemClick { item -> onFileClicked(item) }
-        binding.storageRecycler.adapter = fileAdapter
+        binding.rvFiles.adapter = fileAdapter
         if (isQPlus() && pathArgument.systemDir().isNotEmpty()) {
             val intent = mContext.askPermission(pathArgument.systemDir(), pathArgument)
             val uri = baseConfig.getUriPath(currentEnum)
@@ -232,7 +237,7 @@ class InternalFragment : BaseFragment(), FileListener {
         binding.restrictionLayout.isVisible = storage.getCountChild() == 0
         ensureBackgroundThread {
             runCatching {
-                val items = findFiles(storage)
+                val items = findFiles(null, false)
                 mActivity.runOnUiThread {
                     fileAdapter.addAll(items)
                 }
@@ -240,10 +245,16 @@ class InternalFragment : BaseFragment(), FileListener {
         }
     }
     private fun savedLayoutManager() {
-        binding.storageRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.rvFiles.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 scrollState = getLayoutList(recyclerView).onSaveInstanceState()
+            }
+        })
+        binding.rvFiles.setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
+            override fun onFastScrollStart() {}
+            override fun onFastScrollStop() {
+                scrollState = getLayoutList(binding.rvFiles).onSaveInstanceState()
             }
         })
     }
@@ -352,12 +363,11 @@ class InternalFragment : BaseFragment(), FileListener {
     }
     companion object {
         private var scrollState: Parcelable? = null
-        private const val PATH_ARG = "path_arg"
         private var systemNewApi: SystemNewApi? = null
         fun newInstance(path: String): InternalFragment {
             return InternalFragment().apply {
                 arguments = Bundle().apply {
-                    putString(PATH_ARG, path)
+                    putString(PATH_ARG_FRAG, path)
                 }
             }
         }

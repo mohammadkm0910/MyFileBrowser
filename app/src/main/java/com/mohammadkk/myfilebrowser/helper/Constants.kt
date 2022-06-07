@@ -35,7 +35,7 @@ val extraDocsMimeType = arrayListOf(
     "application/vnd.ms-word.template.macroEnabled.12",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
 )
-
+const val PATH_ARG_FRAG = "path_arg_frag"
 const val INTENT_EXTRA_URI_NEW_API = "android.provider.extra.INITIAL_URI"
 const val IMAGES = "images"
 const val VIDEOS = "videos"
